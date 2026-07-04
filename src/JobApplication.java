@@ -14,17 +14,12 @@ public class JobApplication {
     private boolean followUpNeeded;
 
     public JobApplication(){
-        this.applicationID = 0;
         this.company = "";
         this.position = "";
-        this.status = null;
-        this.salary = 0.0;
         this.location = "";
-        this.workStructure = null;
         this.applicationDate = LocalDate.now();
         this.lastUpdatedDate = LocalDate.now();
         this.applicationUrl = "";
-        this.followUpNeeded = false;
 
     }
     public JobApplication(int applicationID, String company, String position, ApplicationStatus status, double salary, String location,
@@ -131,48 +126,13 @@ public class JobApplication {
     }
     @Override
     public String toString(){
-        String applicationStatusDisplay;
-        String workStructureDisplay;
-        String applicationDateDisplay;
-        String lastUpdatedDisplay;
-        String salaryDisplay;
-        String urlDisplay;
-        if(status == null){
-            applicationStatusDisplay = "N/A";
-        }
-        else{
-            applicationStatusDisplay = status.getDisplayName();
-        }
-        if(workStructure == null){
-            workStructureDisplay = "N/A";
-        }
-        else{
-            workStructureDisplay = workStructure.getDisplayName();
-        }
-        if(applicationDate == null){
-            applicationDateDisplay = "N/A";
-        }
-        else{
-            applicationDateDisplay = applicationDate.toString();
-        }
-        if(lastUpdatedDate == null){
-            lastUpdatedDisplay = "N/A";
-        }
-        else{
-            lastUpdatedDisplay = lastUpdatedDate.toString();
-        }
-        if(salary <=0){
-            salaryDisplay = "N/A";
-        }
-        else{
-            salaryDisplay = "$" + salary;
-        }
-        if(applicationUrl == null || applicationUrl.isBlank()){
-            urlDisplay = "n/A";
-        }
-        else{
-            urlDisplay = applicationUrl;
-        }
+        String applicationStatusDisplay = (status!= null) ? status.getDisplayName() : "N/A";
+        String workStructureDisplay = (workStructure != null) ? workStructure.getDisplayName() : "N/A";
+        String applicationDateDisplay = (applicationDate != null) ? applicationDate.toString() : "N/A";
+        String lastUpdatedDisplay = (lastUpdatedDate != null) ? lastUpdatedDate.toString() : "N/A";
+        String salaryDisplay = (salary > 0) ? "$" + salary : "N/A";
+        String urlDisplay = (applicationUrl != null && !applicationUrl.isBlank()) ? applicationUrl : "N/A";
+
         return "\n**********" + "\nJob Application Record ~" + "\n**********" +
                 "\nApplication ID: " + applicationID + "\nCompany: " + company + "\nPoisition: " + position
                 + "\nStatus: " + applicationStatusDisplay + "\nSalary: " + salaryDisplay + "\nLocation: " + location

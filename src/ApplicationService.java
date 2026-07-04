@@ -14,38 +14,24 @@ public class ApplicationService {
     }
 
     public boolean validateApplication(JobApplication application) {
-        if (application == null) {
+        if (application == null || application.getStatus() == null || application.getWorkStructure() == null ) {
             return false;
         }
-        if (application.getCompany() == null || application.getCompany().isBlank()) {
+        if (application.getCompany() == null || application.getCompany().isBlank() || application.getPosition() == null || application.getPosition().isBlank()
+        || application.getLocation() == null || application.getLocation().isBlank()){
             return false;
         }
-        if (application.getPosition() == null || application.getPosition().isBlank()) {
+        if (application.getSalary() < 0){
             return false;
         }
-        if (application.getLocation() == null || application.getLocation().isBlank()) {
-            return false;
-        }
-        if (application.getStatus() == null) {
-            return false;
-        }
-        if (application.getWorkStructure() == null) {
-            return false;
-        }
-        if (!validateSalary(application.getSalary())) {
-            return false;
-        }
-        if (!validateDate(application.getApplicationDate())) {
+        if (application.getApplicationDate() == null || application.getApplicationDate().isAfter(LocalDate.now())){
             return false;
         }
         return true;
     }
 
     public boolean addApplication(JobApplication application) {
-        if (!validateApplication(application)) {
-            return false;
-        }
-        if (isDuplicateApplication(application)) {
+        if (!validateApplication(application) || isDuplicateApplication(application)){
             return false;
         }
         application.setApplicationID(createApplicationID());
@@ -53,26 +39,33 @@ public class ApplicationService {
         applications.add(application);
         return true;
     }
-
-
-    public boolean validateSalary(double salary) {
-        if (salary >= 0) {
-            return true;
-        } else {
+    public boolean updateApplication(JobApplication application){
+        if(!validateApplication(application)){
             return false;
         }
+        JobApplication currentApplication = findApplicationById(application.getApplicationID());
+        if(currentApplication == null){
+            return false;
+        }
+        currentApplication.setCompany(application.getCompany());
+        currentApplication.setPosition(application.getPosition());
+        currentApplication.setLocation(application.getLocation());
+        currentApplication.setStatus(application.getStatus());
+        currentApplication.setWorkStructure(application.getWorkStructure());
+        currentApplication.setSalary(application.getSalary());
+        currentApplication.setApplicationDate(application.getApplicationDate());
+        currentApplication.setLastUpdatedDate(LocalDate.now());
+        return true;
     }
-    public boolean validateDate(LocalDate date){
-        if(date == null){
-            return false;
+    public JobApplication findApplicationById(int applicationID){
+        for(JobApplication application : applications){
+            if(application.getApplicationID() == applicationID){
+                return application;
+            }
         }
-        if(date.isAfter(LocalDate.now())){
-            return false;
-        }
-        else{
-            return true;
-        }
+        return null;
     }
+
     private int createApplicationID(){
         int maxID = 0;
         for(JobApplication application : applications){
@@ -89,5 +82,13 @@ public class ApplicationService {
             }
         }
         return false;
+    }
+    public boolean isFollowUpNeeded(JobApplication application){
+        if(application == null || application.getStatus() == ApplicationStatus.DENIED || application.getLastUpdatedDate() == null){
+            return false;
+        }
+        LocalDate followUpDate = LocalDate.now().minusDays(followUpLimit);
+
+        return !application.getLastUpdatedDate().isAfter(followUpDate);
     }
 }
