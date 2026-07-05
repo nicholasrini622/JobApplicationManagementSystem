@@ -8,6 +8,8 @@ import java.time.format.DateTimeFormatter;
 
 public class ImportService {
     private ApplicationService applicationService;
+
+
     private int invalidRecordCount;
     public ImportService(ApplicationService applicationService){
         this.applicationService = applicationService;
@@ -94,5 +96,8 @@ public class ImportService {
         }
         String[] parts = line.split(",");
         return parts.length >= 7;
+    }
+    public int getInvalidRecordCount() {
+        return invalidRecordCount;
     }
         }
