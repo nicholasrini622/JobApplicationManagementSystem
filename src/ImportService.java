@@ -1,3 +1,10 @@
+/*
+Nicholas Rini
+Software Development I
+07/05/2026
+Class: ImportService
+Purpose: Handle importing job application records from a text file.  Adds valid records to current list
+ */
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.time.LocalDate;
@@ -15,6 +22,12 @@ public class ImportService {
         this.applicationService = applicationService;
         this.invalidRecordCount = 0;
     }
+/*
+Method: importApplications
+Purpose: Read text file, parse each row, import any valid job application records
+Parameters: String filePath
+Return: ArrayList<JobApplication> of imported applications
+ */
     public ArrayList<JobApplication> importApplications(String filePath) {
         ArrayList<JobApplication> importList = new ArrayList<>();
         invalidRecordCount = 0;
@@ -40,7 +53,12 @@ public class ImportService {
         }
         return importList;
     }
-
+/*
+Method: parseApplicationLine
+Purpose: Convert a row from an imported text file in to a JobApplication object
+Parameters: String line
+Return: JobApplication
+ */
     public JobApplication parseApplicationLine(String line){
         if(!validateFile(line)){
             System.out.println("Invalid format!  A row must have 7 fields.");
@@ -89,7 +107,12 @@ public class ImportService {
         return new JobApplication(0,company,position,status,salary,location,workStructure,applicationDate,LocalDate.now(),applicationUrl,false);
         }
 
-
+/*
+Method: validateFile
+Purpose: Check if a row from imported file has the required format
+Parameters: String line
+Return: boolean - true if a row has 7 fields, false if the row is blank or incomplete
+ */
     public boolean validateFile(String line){
         if(line == null || line.isBlank()){
             return false;

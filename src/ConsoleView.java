@@ -1,3 +1,11 @@
+/*
+Nicholas Rini
+Software Development I
+07/05/2026
+Class: ConsoleView
+Purpose: Handles the console input and output of the Job Application Management System
+Menu Display, input validation, error and confirmation messages, and record displays
+ */
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -14,10 +22,22 @@ public class ConsoleView {
         this.scanner = new Scanner(System.in);
         this.statusMessage = "";
     }
+/*
+Method: setController
+Purpose: Connect ConsoleView to ApplicationController
+Parameters: ApplicationController controller
+Return: boolean - true after controller is assigned
+ */
     public boolean setController(ApplicationController controller){
         this.controller = controller;
         return true;
     }
+/*
+Method: displayMenu
+Purpose: Displays the main CLI menu to the user
+Parameters: None
+Return: boolean - true after menu is displayed (didn't want to add void method)
+ */
     public boolean displayMenu(){
         System.out.println("\n**********");
         System.out.println("Job Application Management System");
@@ -33,6 +53,12 @@ public class ConsoleView {
         System.out.println("9. Quit");
         return true;
     }
+/*
+Method: menuChoice
+Purpose:  Read and validate user's menu choice
+Parameters: none
+Return: int
+ */
     public int menuChoice(){
         while(true){
             System.out.println("Choose a menu option");
@@ -50,6 +76,12 @@ public class ConsoleView {
         }
 
         }
+/*
+Method: collectApplicationInput
+Purpose:  Collect and validate job application record details
+Parameters: None
+Return: JobApplication
+ */
     public JobApplication collectApplicationInput(){
         String company = "";
         while(company.isBlank()){
@@ -132,6 +164,12 @@ public class ConsoleView {
         return new JobApplication(0,company,position,status,salary,location,workStructure,applicationDate,LocalDate.now(),
                 applicationUrl,false);
     }
+/*
+Method: readApplicationId
+Purpose: Read applicationId entered by user, validate ID
+Parameters: None
+Return: int
+ */
     public int readApplicationId(){
         while(true){
             System.out.println("Enter an application ID");
@@ -148,6 +186,12 @@ public class ConsoleView {
             }
         }
     }
+/*
+Method: readSortField
+Purpose: Read and validate what field user wants to sort by
+Parameters: None
+Return: String
+ */
     public String readSortField(){
         while(true){
             System.out.println("\n Application Sorting Options");
@@ -171,6 +215,12 @@ public class ConsoleView {
             }
         }
     }
+/*
+Method: displayAllApplications
+Purpose: Display job application records passed in
+Parameters: ArrayList<JobApplication>
+Return: boolean - true after record or no application record found displayed
+ */
     public boolean displayAllApplications(ArrayList<JobApplication> applications){
         System.out.println("\n*** Application Records***");
         if(applications == null || applications.isEmpty()){
@@ -182,16 +232,34 @@ public class ConsoleView {
         }
         return true;
     }
+/*
+Method: showMessage
+Purpose: Display a message to user
+Parameters: String message
+Return: boolean - true after a message is displayed
+ */
     public boolean showMessage(String message){
         statusMessage = message;
         System.out.println(message);
         return true;
     }
+/*
+Method: showError
+Purpose: Display error message to the user
+Parameters: String error
+Return: boolean - true after error message is displayed
+ */
     public boolean showError(String error){
         statusMessage = error;
         System.out.println(error);
         return true;
     }
+/*
+Method: showFollowUp
+Purpose: Display any applications that need a follow-up
+Parameters: ArrayList<JobApplication> applications
+Return: boolean - true after records or no alerts found displayed
+ */
     public boolean showFollowUp(ArrayList<JobApplication> applications){
         System.out.println("\n*** Follow-UP ***");
         if(applications == null || applications.isEmpty()){
@@ -203,6 +271,12 @@ public class ConsoleView {
         }
         return true;
     }
+/*
+Method: deleteConfirmation
+Purpose:  Display application record selected to be removed and ask for confirmation
+Parameters: JobApplication application
+Return: boolean - true after user confirms removal, false if the user decides to cancel or doesnt select a record
+ */
     public boolean deleteConfirmation(JobApplication application){
         if(application == null){
             System.out.println("No application selected.");
@@ -222,6 +296,12 @@ public class ConsoleView {
                 System.out.println("Error: Please choose yes or no, or y/n");
             }
         }
+/*
+Method: readStatusFilter
+Purpose: read and validate a status to filter chosen by the user
+Parameters: None
+Return: ApplicationStatus
+ */
     public ApplicationStatus readStatusFilter(){
         while(true){
             System.out.println("\nApplication status Options");
@@ -248,6 +328,12 @@ public class ConsoleView {
             }
         }
     }
+/*
+Method: readFilePath
+Purpose: Read the text file path that will be used to import job application records
+Parameters: None
+Return: String
+ */
     public String readFilePath(){
         System.out.println("Enter file path to import text file");
         return scanner.nextLine().trim();

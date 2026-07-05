@@ -1,3 +1,11 @@
+/*
+Nicholas Rini
+Software Development I
+07/05/2026
+Class: ApplicationService
+Purpose:  This class will manage validation, adding, updating, removing, sorting, filtering, and follow-up check for
+ArrayList<JobApplication>
+ */
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,7 +23,12 @@ public class ApplicationService {
             this.followUpLimit = 7;
         }
     }
-
+/*
+Method: validateApplication
+Purpose:  Validates if a job application has all the required fields before storing the record.
+Parameters: JobApplication application
+Return:  Boolean - true if valid, false if record is invalid.
+ */
     public boolean validateApplication(JobApplication application) {
         if (application == null || application.getStatus() == null || application.getWorkStructure() == null) {
             return false;
@@ -32,7 +45,12 @@ public class ApplicationService {
         }
         return true;
     }
-
+/*
+Method: addApplication
+Purpose:  Adds valid unique job application to ArrayList<JobApplication>
+Parameters: JobApplication application
+Return:  Boolean - true if application record is added, false if invalid or non-unique.
+ */
     public boolean addApplication(JobApplication application) {
         if (!validateApplication(application) || isDuplicateApplication(application)) {
             return false;
@@ -42,7 +60,12 @@ public class ApplicationService {
         applications.add(application);
         return true;
     }
-
+/*
+Method: updateApplication
+Purpose:  Update an existing application record with valid information
+Parameters: JobApplication application
+Return: boolean - true if record was updated, false if the record was invalid, a duplicate, or missing.
+ */
     public boolean updateApplication(JobApplication application) {
         if (!validateApplication(application)) {
             return false;
@@ -68,7 +91,12 @@ public class ApplicationService {
         currentApplication.setLastUpdatedDate(LocalDate.now());
         return true;
     }
-
+/*
+Method: removeAppplication
+Purpose:  Remove  a jobApplication record from the list based on applicationID
+Parameters: int applicationID
+Return: boolean - true if application was removed, false if there isn't a matching ID
+ */
     public boolean removeApplication(int applicationID) {
         JobApplication application = findApplicationById(applicationID);
         if (application == null) {
@@ -77,7 +105,12 @@ public class ApplicationService {
         applications.remove(application);
         return true;
     }
-
+/*
+Method: findApplicationById
+Purpose: This method searches the application record list for any record with a matching ID
+Parameters: int applicationID
+Returns; JobApplication or null if no match
+ */
     public JobApplication findApplicationById(int applicationID) {
         for (JobApplication application : applications) {
             if (application.getApplicationID() == applicationID) {
@@ -86,11 +119,21 @@ public class ApplicationService {
         }
         return null;
     }
-
+/*
+Method: getAllApplications()
+Purpose: Gives access to current ArrayList<JobApplication>
+Parameter: None
+Return:  ArrayList<JobApplication>
+ */
     public ArrayList<JobApplication> getAllApplications() {
         return applications;
     }
-
+/*
+Method: createApplicationID()
+Purpose:  Finds the highest current ID and adds one to create next application ID
+Parameters: None
+Return: int
+ */
     private int createApplicationID() {
         int maxID = 0;
         for (JobApplication application : applications) {
@@ -100,7 +143,12 @@ public class ApplicationService {
         }
         return maxID + 1;
     }
-
+/*
+Method: sortApplications
+Purpose: Create a sorted application record list copy based on a selected field
+Parameters: String sortField
+Return: sorted ArrayList<JobApplication>
+ */
     public ArrayList<JobApplication> sortApplications(String sortField) {
         ArrayList<JobApplication> sortedList = new ArrayList<>(applications);
         if (sortField == null || sortField.isBlank()) {
@@ -147,6 +195,12 @@ public class ApplicationService {
         }
         return sortedList;
     }
+/*
+Method: filterByStatus
+Purpose: Create a filtered application list based on a certain status
+Parameters: ApplicationStatus status
+Return: filtered ArrayList<JobApplication>
+ */
     public ArrayList<JobApplication> filterByStatus(ApplicationStatus status){
         ArrayList<JobApplication> filterList = new ArrayList<>();
         for(JobApplication application: applications){
@@ -156,7 +210,12 @@ public class ApplicationService {
         }
         return filterList;
     }
-
+/*
+Method: isDuplicateApplication
+Purpose: Check if an existing application already has the same company and position
+Parameters: JobApplication applicationCopy
+Return: boolean - true if duplicate is found, false if no duplicate is found.
+ */
     private boolean isDuplicateApplication(JobApplication applicationCopy) {
         for (JobApplication application : applications) {
             if (application.getCompany().equalsIgnoreCase(applicationCopy.getCompany()) && application.getPosition().equalsIgnoreCase(applicationCopy.getPosition())) {
@@ -165,7 +224,12 @@ public class ApplicationService {
         }
         return false;
     }
-
+/*
+Method: isFollowUpNeeded
+Purpose: Check if a application record needs a follow-up based off last updated date
+Parameters: JobApplication application
+Return: boolean - true if follow-up is required, false if no follow-up needed
+ */
     public boolean isFollowUpNeeded(JobApplication application) {
         if (application == null || application.getStatus() == ApplicationStatus.DENIED || application.getLastUpdatedDate() == null) {
             return false;
@@ -174,6 +238,12 @@ public class ApplicationService {
 
         return !application.getLastUpdatedDate().isAfter(followUpDate);
     }
+/*
+Method: getFollowUpApplications()
+Purpose: Method will create a list of applications that need a follow-up
+Parameters: None
+Return: ArrayList<JobApplication> records that need a follow-up.
+ */
     public ArrayList<JobApplication> getFollowUpApplications(){
         ArrayList<JobApplication> followUp = new ArrayList<>();
         for(JobApplication application : applications){
@@ -189,11 +259,21 @@ public class ApplicationService {
         }
         return followUp;
     }
-
+/*
+Method: validateSalary
+Purpose: Validation for salary field
+Parameters: double salary
+Return: boolean - true if salary is >=0, false it the salary is a negative number
+ */
     public boolean validateSalary(double salary) {
         return salary >= 0;
     }
-
+/*
+Method: validateDate
+Purpose: Validation for application date.  Checks if date is from the future
+Parameters: LocalDate date
+Return: boolean - true if date is valid, false if date is null or from the future.
+ */
     public boolean validateDate(LocalDate date) {
         if (date == null) {
             return false;

@@ -1,3 +1,11 @@
+/*
+Nicholas Rini
+Software Development I
+07/05/2026
+Class: JobApplication
+Purpose: JobApplication class stores the data for a single job application record.  Records include a company,position,status,
+salary, location, workStructure, date, optional URL, and a follow-up status.  LocalDate used for formatting and manipulation.
+ */
 import java.time.LocalDate;
 
 public class JobApplication {
