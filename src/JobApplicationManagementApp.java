@@ -8,7 +8,7 @@ alerts for Job Application records.  The user shall be able to import records fr
 one storage and operation center for Job Application Records.
  */
 
-public class Main{
+public class JobApplicationManagementApp {
     public static void main(String[] args){
         ApplicationService applicationService = new ApplicationService(7);
         ImportService importService = new ImportService(applicationService);
