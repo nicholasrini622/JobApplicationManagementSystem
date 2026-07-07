@@ -5,6 +5,7 @@ Software Development I
 Class: ImportService
 Purpose: Handle importing job application records from a text file.  Adds valid records to current list
  */
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.time.LocalDate;
@@ -38,18 +39,26 @@ Return: ArrayList<JobApplication> of imported applications
         try {
             File file = new File(filePath.trim());
             Scanner scanner = new Scanner(file);
+            int rowNumber = 0;
             while (scanner.hasNextLine()) {
+                rowNumber++;
                 String line = scanner.nextLine();
-                JobApplication application = parseApplicationLine(line);
-                if (application != null && applicationService.addApplication(application)) {
-                    importList.add(application);
-                } else {
+                try {
+                    JobApplication application = parseApplicationLine(line);
+                    if (applicationService.addApplication(application)) {
+                        importList.add(application);
+                    } else {
+                        invalidRecordCount++;
+                        System.out.println("Row Skipped: " + rowNumber + "Invalid or duplicate record");
+                    }
+                } catch (InvalidImportException e) {
                     invalidRecordCount++;
+                    System.out.println("Row skilled: " + rowNumber + e.getMessage());
                 }
             }
             scanner.close();
         } catch (FileNotFoundException e) {
-            System.out.println("File was not located.");
+            System.out.println("File not found.");
         }
         return importList;
     }
@@ -59,53 +68,46 @@ Purpose: Convert a row from an imported text file in to a JobApplication object
 Parameters: String line
 Return: JobApplication
  */
-    public JobApplication parseApplicationLine(String line){
-        if(!validateFile(line)){
-            System.out.println("Invalid format!  A row must have 7 fields.");
-            return null;
-        }
-        String[] parts = line.split(",");
-        String company = parts[0].trim();
-        String position = parts[1].trim();
-        ApplicationStatus status = ApplicationStatus.fromString(parts[2].trim());
-        double salary;
-        try{
-            salary = Double.parseDouble(parts[3].trim());
-            if(salary< 0){
-                System.out.println("Salary cannot be negative.  Salary should be >=0");
-                return null;
+            public JobApplication parseApplicationLine (String line) throws InvalidImportException {
+                if (!validateFile(line)) {
+                    throw new InvalidImportException("A job application Record row must have 7 fields");
+                }
+                String[] parts = line.split(",");
+                String company = parts[0].trim();
+                String position = parts[1].trim();
+                ApplicationStatus status = ApplicationStatus.fromString(parts[2].trim());
+                double salary;
+                try {
+                    salary = Double.parseDouble(parts[3].trim());
+                    if (salary < 0) {
+                        throw new InvalidImportException("Salary can't be a negative value");
+                    }
+                } catch (NumberFormatException e) {
+                    throw new InvalidImportException("Salary is an invalid number");
+                }
+                String location = parts[4].trim();
+                WorkStructure workStructure = WorkStructure.fromString(parts[5].trim());
+                LocalDate applicationDate;
+                try {
+                    String dateDisplay = parts[6].trim();
+                    if (dateDisplay.contains("/")) {
+                        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+                        applicationDate = LocalDate.parse(dateDisplay, dateFormat);
+                    } else {
+                        applicationDate = LocalDate.parse(dateDisplay);
+                    }
+                } catch (DateTimeParseException e) {
+                    throw new InvalidImportException("Invalid date format. Use yyyy/MM/dd");
+                }
+                String applicationUrl = "";
+                if (parts.length >= 8) {
+                    applicationUrl = parts[7].trim();
+                }
+                if (status == null || workStructure == null) {
+                    throw new InvalidImportException("Invalid application status or work structure");
+                }
+                return new JobApplication(0, company, position, status, salary, location, workStructure, applicationDate, LocalDate.now(), applicationUrl, false);
             }
-        }
-        catch(NumberFormatException e){
-            System.out.println("Invalid salary.");
-            return null;
-        }
-        String location = parts[4].trim();
-        WorkStructure workStructure = WorkStructure.fromString(parts[5].trim());
-        LocalDate applicationDate;
-        try {
-            String dateDisplay = parts[6].trim();
-            if (dateDisplay.contains("/")) {
-                DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-                applicationDate = LocalDate.parse(dateDisplay, dateFormat);
-            }
-            else {
-                applicationDate = LocalDate.parse(dateDisplay);
-            }
-        }catch (DateTimeParseException e) {
-            System.out.println("Invalid date formatting.  Use yyyy/MM/dd.");
-            return null;
-        }
-        String applicationUrl = "";
-        if(parts.length >= 8){
-            applicationUrl = parts[7].trim();
-        }
-        if(status == null || workStructure == null){
-            System.out.println("Invalid status or workStructure");
-            return null;
-        }
-        return new JobApplication(0,company,position,status,salary,location,workStructure,applicationDate,LocalDate.now(),applicationUrl,false);
-        }
 
 /*
 Method: validateFile
@@ -113,14 +115,15 @@ Purpose: Check if a row from imported file has the required format
 Parameters: String line
 Return: boolean - true if a row has 7 fields, false if the row is blank or incomplete
  */
-    public boolean validateFile(String line){
-        if(line == null || line.isBlank()){
-            return false;
-        }
-        String[] parts = line.split(",");
-        return parts.length >= 7;
+            public boolean validateFile (String line){
+                if (line == null || line.isBlank()) {
+                    return false;
+                }
+                String[] parts = line.split(",");
+                return parts.length >= 7;
+            }
+            public int getInvalidRecordCount () {
+                return invalidRecordCount;
+            }
+
     }
-    public int getInvalidRecordCount() {
-        return invalidRecordCount;
-    }
-        }
