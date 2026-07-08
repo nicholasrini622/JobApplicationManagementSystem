@@ -6,6 +6,7 @@ Class: ConsoleView
 Purpose: Handles the console input and output of the Job Application Management System
 Menu Display, input validation, error and confirmation messages, and record displays
  */
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -337,5 +338,161 @@ Return: String
     public String readFilePath(){
         System.out.println("Enter file path to import text file");
         return scanner.nextLine().trim();
+    }
+    public JobApplication UpdatedApplicationInput(JobApplication currentApplication){
+        JobApplication updatedApplication = new JobApplication(currentApplication.getApplicationID(), currentApplication.getCompany(),
+                currentApplication.getPosition(), currentApplication.getStatus(), currentApplication.getSalary(), currentApplication.getLocation(),
+                currentApplication.getWorkStructure(), currentApplication.getApplicationDate(), currentApplication.getLastUpdatedDate(),
+                currentApplication.getApplicationUrl(), currentApplication.isFollowUpNeeded());
+        boolean isUpdating = true;
+        while(isUpdating){
+            System.out.println("\nSelect a field to update");
+            System.out.println("1. Company");
+            System.out.println("2. Position");
+            System.out.println("3. Status");
+            System.out.println("4. Salary");
+            System.out.println("5. Location");
+            System.out.println("6. Work Structure");
+            System.out.println("7. Application Date");
+            System.out.println("8. Application URL");
+            System.out.println("9. Done updating");
+            String choice = scanner.nextLine().trim();
+            switch(choice){
+                case "1":
+                    String company = "";
+                    while(company.isBlank()){
+                        System.out.println("Enter new company name.");
+                        company = scanner.nextLine().trim();
+                        if(company.isBlank()){
+                            System.out.println("Updated name cannot be blank");
+                        }
+                    }
+                    updatedApplication.setCompany(company);
+                    break;
+                case "2":
+                String position = "";
+                while(position.isBlank()){
+                    System.out.println("Enter updated position.");
+                    position = scanner.nextLine().trim();
+                    if(position.isBlank()){
+                        System.out.println("Updated fields can not be blank");
+                    }
+                }
+                updatedApplication.setPosition(position);
+                break;
+                case "3":
+                    updatedApplication.setStatus(readStatusFilter());
+                    break;
+                case "4":
+                    double salary = -1;
+                    while(salary<0){
+                        System.out.println("Enter updated salary amount greater than or equal to 0");
+                        String input = scanner.nextLine().trim();
+                        try{
+                            salary = Double.parseDouble(input);
+                            if(salary < 0){
+                                System.out.println("Salary must be >= 0");
+                            }
+                        }
+                        catch(NumberFormatException e){
+                            System.out.println("Please enter a valid salary integer >= 0");
+                        }
+                    }
+                    updatedApplication.setSalary(salary);
+                    break;
+                case "5":
+                    String location = "";
+                            while(location.isBlank()){
+                                System.out.println("Enter an updated location.");
+                                location = scanner.nextLine().trim();
+                                if(location.isBlank()){
+                                    System.out.println("Updated location field cannot be blank");
+                                }
+                            }
+                            updatedApplication.setLocation(location);
+                            break;
+                case "6":
+                    WorkStructure workStructure = null;
+                    while(workStructure == null){
+                        System.out.println("\n Work Structure choices:");
+                        System.out.println("1. ONSITE");
+                        System.out.println("2. REMOTE");
+                        System.out.println("3. HYBRID");
+                        String structureChoice = scanner.nextLine().trim();
+                        if(structureChoice.equals("1")){
+                            workStructure = WorkStructure.ONSITE;
+                        }
+                        else if(structureChoice.equals("2")){
+                            workStructure = WorkStructure.REMOTE;
+                        }
+                        else if(structureChoice.equals("3")){
+                            workStructure = WorkStructure.HYBRID;
+                        }
+                        else{
+                            System.out.println("Invalid choice.  Choose a number 1-3");
+                        }
+                    }
+                    updatedApplication.setWorkStructure(workStructure);
+                    break;
+                case "7":
+                    LocalDate applicationDate = null;
+                    while(applicationDate == null){
+                        System.out.println("Enter an updated application date.  Must use yyyy/MM/dd format");
+                        String input = scanner.nextLine().trim();
+                        String[] date = input.split("/");
+                        if(date.length != 3){
+                            System.out.println("Date format must be yyyy/MM/dd");
+                            continue;
+                        }
+                        try{
+                            String yearFormat = date[0];
+                            String monthFormat = date[1];
+                            String dayFormat = date[2];
+                            if(yearFormat.length() != 4){
+                                System.out.println("Invalid year");
+                                continue;
+                            }
+                            int year = Integer.parseInt(yearFormat);
+                            int month = Integer.parseInt(monthFormat);
+                            int day = Integer.parseInt(dayFormat);
+                            if(month <1 || month >12){
+                                System.out.println("Invalid month.  Use 1-12 for month.");
+                            }
+                            if(day < 1 || day >31){
+                                System.out.println("Invalid day. Use 1-31 for day");
+                            }
+                            if(year< 1926){
+                                System.out.println("Year is over 100 years old.  Application can not be 100 years in the past");
+                            }
+                            applicationDate = LocalDate.of(year,month,day);
+                            if(applicationDate.isAfter(LocalDate.now())){
+                                System.out.println("Welcome to the future.");
+                                applicationDate = null;
+                            }
+
+                        }
+                        catch(NumberFormatException e){
+                            System.out.println("Invalid date.  Date must be numbers in yyyy/MM/dd format.");
+                        }
+                        catch(DateTimeException e){
+                            System.out.println("Invalid day.  Day does not exist.");
+                        }
+                    }
+                    updatedApplication.setApplicationDate(applicationDate);
+                    break;
+                case "8":
+                    System.out.println("Enter updated url or leave blank");
+                    String applicationUrl = scanner.nextLine().trim();
+                    updatedApplication.setApplicationUrl(applicationUrl);
+                    break;
+                case "9":
+                    isUpdating = false;
+                    break;
+                default:
+                    System.out.println("Invalid input.  Please enter a number 1-9");
+                    break;
+            }
+        }
+        return updatedApplication;
     }
 }

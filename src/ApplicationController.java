@@ -155,7 +155,7 @@ Return: boolean - true after loop ends (did not want to create void methods)
                     else{
                         view.showMessage("Current application record to update");
                         System.out.println(currentApplication);
-                        JobApplication updatedApplication = view.collectApplicationInput();
+                        JobApplication updatedApplication = view.UpdatedApplicationInput(currentApplication);
                         updatedApplication.setApplicationID(updateID);
                         processUpdateApplication(updatedApplication);
 
