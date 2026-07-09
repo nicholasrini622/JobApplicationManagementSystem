@@ -27,6 +27,7 @@ class ApplicationServiceTest {
         JobApplication testApplication = applicationService.getAllApplications().getFirst();
         assertEquals(1, testApplication.getApplicationID(), "Error: Application ID for first record should be 1");
         assertEquals("Data quality informatic", testApplication.getPosition());
+        System.out.println("Add application test passed. Valid application added and record count was increased to 1.  First ID is 1.");
     }
     @org.junit.jupiter.api.Test
     @DisplayName("Add duplicate application test")
@@ -37,6 +38,7 @@ class ApplicationServiceTest {
         boolean result = applicationService.addApplication(duplicateApplication);
         assertFalse(result,"Error Duplicate applications should not be added");
         assertEquals(1,applicationService.getAllApplications().size(),"Error application record list should only have one record");
+        System.out.println("Add duplicate application test passed.  Duplicate company and position rejected.");
     }
 
     @org.junit.jupiter.api.Test
@@ -47,7 +49,7 @@ class ApplicationServiceTest {
         boolean result = applicationService.removeApplication(applicationID);
         assertTrue(result, "Error: Application could not be removed");
         assertEquals(0,applicationService.getAllApplications().size(), "Error: No records should exist after removal");
-
+        System.out.println("Remove application Test passed.  Existing application was removed and record count is 0");
     }
     @org.junit.jupiter.api.Test
     @DisplayName("Remove application test - ID Doesnt Exist")
@@ -56,6 +58,7 @@ class ApplicationServiceTest {
         boolean result = applicationService.removeApplication(2);
         assertFalse(result,"Error Non Existing ID ");
         assertEquals(1,applicationService.getAllApplications().size(),"Error application list should still contain one record.");
+        System.out.println("Remove missing application test passed.  Application ID does not exist, no record was removed.");
     }
     @org.junit.jupiter.api.Test
     @DisplayName("Update application test")
@@ -71,6 +74,7 @@ class ApplicationServiceTest {
         assertNotNull(testApplication, "Error updated application should still exist");
         assertEquals(75000,testApplication.getSalary(), "Error salary should of updated");
         assertEquals("Remote", testApplication.getLocation());
+        System.out.println("Update Application Test passed.  Existing application was updated, record count was not changed.");
     }
     @org.junit.jupiter.api.Test
     @DisplayName("Update Non-Existing application test")
@@ -81,6 +85,7 @@ class ApplicationServiceTest {
         boolean result = applicationService.updateApplication(missingApplication);
         assertFalse(result,"Error no application to update should return false");
         assertEquals(1,applicationService.getAllApplications().size(),"Error record count should not be updated by a missing application");
+        System.out.println("Update missing application test passed. Application ID does not exist, update was rejected.");
     }
     @org.junit.jupiter.api.Test
     @DisplayName("Follow-Up alert test")
@@ -96,6 +101,7 @@ class ApplicationServiceTest {
         JobApplication followUpApplication = followUp.getFirst();
         assertEquals("Winnie Palmer",followUpApplication.getCompany(),"Error Winnie Palmer needs a follow-up");
         assertTrue(followUpApplication.isFollowUpNeeded(),"Error application needs a follow-up");
+        System.out.println("Follow-Up alert test passed.  Application older than follow-up limit flagged as needing follow-up.");
     }
     @org.junit.jupiter.api.Test
     @DisplayName("No- Follow Up Applications")
@@ -103,5 +109,6 @@ class ApplicationServiceTest {
         applicationService.addApplication(application);
         ArrayList<JobApplication> followUpList = applicationService.getFollowUpApplications();
         assertEquals(0, followUpList.size(),"Error no applications should need a follow-up.");
+        System.out.println("No follow up application test passed.  Application was excluded from follow-up list. ");
     }
 }
