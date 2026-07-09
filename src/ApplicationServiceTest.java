@@ -25,6 +25,17 @@ class ApplicationServiceTest {
         assertEquals("Data quality informatic", testApplication.getPosition());
     }
     @org.junit.jupiter.api.Test
+    @DisplayName("Add duplicate application test")
+    void duplicateApplicationTest(){
+        applicationService.addApplication(application);
+        JobApplication duplicateApplication = new JobApplication(0,"Winnie Palmer","Data quality informatic",ApplicationStatus.APPLIED,75000,"Orlando",WorkStructure.HYBRID,
+                LocalDate.now().minusDays(1),LocalDate.now(),"",false);
+        boolean result = applicationService.addApplication(duplicateApplication);
+        assertFalse(result,"Error Duplicate applications should not be added");
+        assertEquals(1,applicationService.getAllApplications().size(),"Error application record list should only have one record");
+    }
+
+    @org.junit.jupiter.api.Test
     @DisplayName("Remove application test")
     void removeApplicationTest(){
         applicationService.addApplication(application);
@@ -33,6 +44,14 @@ class ApplicationServiceTest {
         assertTrue(result, "Error: Application could not be removed");
         assertEquals(0,applicationService.getAllApplications().size(), "Error: No records should exist after removal");
 
+    }
+    @org.junit.jupiter.api.Test
+    @DisplayName("Remove application test - ID Doesnt Exist")
+    void removeMissingApplication(){
+        applicationService.addApplication(application);
+        boolean result = applicationService.removeApplication(2);
+        assertFalse(result,"Error Non Existing ID ");
+        assertEquals(1,applicationService.getAllApplications().size(),"Error application list should still contain one record.");
     }
     @org.junit.jupiter.api.Test
     @DisplayName("Update application test")
@@ -48,5 +67,15 @@ class ApplicationServiceTest {
         assertNotNull(testApplication, "Error updated application should still exist");
         assertEquals(75000,testApplication.getSalary(), "Error salary should of updated");
         assertEquals("Remote", testApplication.getLocation());
+    }
+    @org.junit.jupiter.api.Test
+    @DisplayName("Update Non-Existing application test")
+    void updateMissingApplication(){
+        applicationService.addApplication(application);
+        JobApplication missingApplication = new JobApplication(123,"Company","Position",ApplicationStatus.IN_PROGRESS,50000,"Orlando",WorkStructure.REMOTE,
+                LocalDate.now().minusDays(1),LocalDate.now(),"",false);
+        boolean result = applicationService.updateApplication(missingApplication);
+        assertFalse(result,"Error no application to update should return false");
+        assertEquals(1,applicationService.getAllApplications().size(),"Error record count should not be updated by a missing application");
     }
 }

@@ -53,7 +53,7 @@ Return: ArrayList<JobApplication> of imported applications
                     }
                 } catch (InvalidImportException e) {
                     invalidRecordCount++;
-                    System.out.println("Row skilled: " + rowNumber + e.getMessage());
+                    System.out.println("Row skipped: " + rowNumber + e.getMessage());
                 }
             }
             scanner.close();
