@@ -2,7 +2,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.lang.reflect.Array;
 import java.time.LocalDate;
+import java.util.ArrayList;
+
 class ApplicationServiceTest {
     ApplicationService applicationService;
     JobApplication application;
@@ -77,5 +81,27 @@ class ApplicationServiceTest {
         boolean result = applicationService.updateApplication(missingApplication);
         assertFalse(result,"Error no application to update should return false");
         assertEquals(1,applicationService.getAllApplications().size(),"Error record count should not be updated by a missing application");
+    }
+    @org.junit.jupiter.api.Test
+    @DisplayName("Follow-Up alert test")
+    void followUpAlertTest(){
+        applicationService.addApplication(application);
+        application.setLastUpdatedDate(LocalDate.now().minusDays(8));
+        JobApplication newApplication = new JobApplication(2,"Advent Health","Data Analyst",ApplicationStatus.APPLIED,65000,"Orlando",WorkStructure.REMOTE,
+                LocalDate.now().minusDays(1),LocalDate.now(),"",false);
+        applicationService.addApplication(newApplication);
+        ArrayList<JobApplication> followUp = applicationService.getFollowUpApplications();
+        assertEquals(1,followUp.size(),"Error only one application needs a follow up");
+
+        JobApplication followUpApplication = followUp.getFirst();
+        assertEquals("Winnie Palmer",followUpApplication.getCompany(),"Error Winnie Palmer needs a follow-up");
+        assertTrue(followUpApplication.isFollowUpNeeded(),"Error application needs a follow-up");
+    }
+    @org.junit.jupiter.api.Test
+    @DisplayName("No- Follow Up Applications")
+    void noFollowUpApplication(){
+        applicationService.addApplication(application);
+        ArrayList<JobApplication> followUpList = applicationService.getFollowUpApplications();
+        assertEquals(0, followUpList.size(),"Error no applications should need a follow-up.");
     }
 }
