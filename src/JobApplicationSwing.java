@@ -1,3 +1,4 @@
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.*;
 import java.awt.*;
@@ -135,7 +136,7 @@ public class JobApplicationSwing {
         importButton.addActionListener(event -> importApplicationFile());
         updateButton.addActionListener(event ->updateSelectedApplication());
         removeButton.addActionListener(event ->removeSelectedApplication());
-        followUpButton.addActionListener(event ->showFollowUP());
+        followUpButton.addActionListener(event ->showFollowUp());
         confirmationLabel = new JLabel("Confirmation Message Here");
         followUpLabel = new JLabel("Follow Up Alert here");
         JPanel messagePanel = new JPanel(new GridLayout(1,2));
@@ -338,9 +339,17 @@ public class JobApplicationSwing {
     }
     private void importApplicationFile(){
         JFileChooser filePicker = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Text Files (*.txt)", "txt");
+        filePicker.setFileFilter(filter);
+        filePicker.setAcceptAllFileFilterUsed(false);
         int result = filePicker.showOpenDialog(applicationTable);
         if(result == JFileChooser.APPROVE_OPTION){
             File fileChoice = filePicker.getSelectedFile();
+            if(!fileChoice.getName().toLowerCase().endsWith(".txt")){
+                confirmationLabel.setText("Import file failed.  Application records must be a .txt file");
+                JOptionPane.showMessageDialog(applicationTable,"File extension must end with .txt","Invalid file extension",JOptionPane.ERROR_MESSAGE);
+                return;
+            };
             importService.importApplications(fileChoice.getAbsolutePath());
             refreshTable();
             int skippedRecord = importService.getInvalidRecordCount();
@@ -371,7 +380,7 @@ public class JobApplicationSwing {
         refreshTable(displayApplications);
         confirmationLabel.setText("Displaying " + displayApplications.size() + "records. Filter: " + statusChoice + ", Sort: " + sortChoice);
     }
-    private void showFollowUP(){
+    private void showFollowUp(){
         ArrayList<JobApplication> followUpApplications = applicationService.getFollowUpApplications();
         if(followUpApplications.isEmpty()){
             followUpLabel.setText("No alerts to display");
