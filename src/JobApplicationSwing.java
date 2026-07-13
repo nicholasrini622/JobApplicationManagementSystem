@@ -3,6 +3,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -79,6 +80,7 @@ public class JobApplicationSwing {
             }
         };
         applicationTable = new JTable(tableModel);
+        applicationTable.setToolTipText("Select a row to Update or Remove application");
         return new JScrollPane(applicationTable);
     }
     private JPanel createTopPanel(){
@@ -99,10 +101,13 @@ public class JobApplicationSwing {
         sortBy.addItem("Position");
         sortBy.addItem("Salary");
         sortBy.addItem("Date");
-
+        statusFilter.setToolTipText("Chooses a status to filter the application records by");
+        sortBy.setToolTipText("Choose a field to sort by");
         JButton apply = new JButton("Apply Changes");
+        apply.setToolTipText("Apply selected options");
         apply.addActionListener(event -> {filterAndSort(statusFilter,sortBy);});
         JButton defaultViewButton = new JButton("Reset to default");
+        defaultViewButton.setToolTipText("Resets table to default view");
         defaultViewButton.addActionListener(event -> {statusFilter.setSelectedItem("Statuses");
         sortBy.setSelectedItem("Company");
         refreshTable();
@@ -126,6 +131,10 @@ public class JobApplicationSwing {
         JButton updateButton = new JButton("Update application");
         JButton removeButton = new JButton("Remove application");
         JButton followUpButton = new JButton("View Follow-Up Alerts");
+        addButton.setToolTipText("Opens up an add application form");
+        importButton.setToolTipText("Opens up file picker .txt extensions only to import");
+        updateButton.setToolTipText("Updates a selected application record");
+        followUpButton.setToolTipText("Checks for application records needing a follow-up");
         buttonPanel.add(addButton);
         buttonPanel.add(importButton);
         buttonPanel.add(updateButton);
@@ -391,5 +400,61 @@ public class JobApplicationSwing {
         refreshTable(followUpApplications);
         followUpLabel.setText(followUpApplications.size() + " need a follow-up");
         JOptionPane.showMessageDialog(applicationTable,followUpApplications.size() + " should be followed up ","Follow-Up alerts",JOptionPane.WARNING_MESSAGE);
+    }
+    private String validateApplication(String company, String position, String salaryText, String location, String applicationDate){
+        if(company.isBlank()){
+            return "Company can not be left empty";
+        }
+        if(position.isBlank()){
+            return "Position can not be left empty";
+        }
+        if(salaryText.isBlank()){
+            return "Salary can not be left empty must be a >=0";
+        }
+        try{
+            double salary = Double.parseDouble(salaryText);
+            if(salary< 0){
+                return "salary can not be a negative number";
+            }
+        }
+        catch(NumberFormatException e){
+            return "A valid salary is a number greater than or equal to 0";
+        }
+        if(location.isBlank()){
+            return "Location can not be left empty";
+        }
+        if(applicationDate.isBlank()){
+            return "Application date can not be left empty";
+        }
+        String[] dateComponent = applicationDate.split("/");
+        if(dateComponent.length != 3){
+            return "Error in formatting.  Use yyyy/MM/dd format";
+        }
+        try{
+            int year = Integer.parseInt(dateComponent[0]);
+            int month = Integer.parseInt(dateComponent[1]);
+            int day = Integer.parseInt(dateComponent[2]);
+            if(dateComponent[0].length() != 4){
+                return "Year must only contain 4 digits";
+            }
+            if(month < 1 || month > 12){
+                return "Date must have a valid month.  1-12.";
+            }
+            if(day < 1 || day > 31){
+                return "Invalid day.  A month can only have 1-31 days";
+            }
+            if(year < 1926){
+                return "Time to retire.  Application is over 100 years old.";
+            }
+            LocalDate applicationDateEdit = LocalDate.of(year,month,day);
+
+        }
+        catch(NumberFormatException e){
+            return "Application date must be in yyyy/MM/dd format";
+        }
+        catch(DateTimeException e){
+            return "Date does not exist.";
+        }
+        return null;
     }
 }
