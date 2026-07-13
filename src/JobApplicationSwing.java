@@ -111,7 +111,7 @@ public class JobApplicationSwing {
         addButton.addActionListener(event ->{openAddApplicationForm();
         });
         importButton.addActionListener(event -> {confirmationLabel.setText("Import File clicked");});
-        updateButton.addActionListener(event ->{confirmationLabel.setText("Update selected clicked");});
+        updateButton.addActionListener(event ->updateSelectedApplication());
         removeButton.addActionListener(event ->removeSelectedApplication());
         followUpButton.addActionListener(event ->{followUpLabel.setText("Follow Up Alerts Clicked");});
         confirmationLabel = new JLabel("Confirmation Message Here");
@@ -222,5 +222,96 @@ public class JobApplicationSwing {
                 JOptionPane.showMessageDialog(applicationTable,"Application was not removed","Application removed failed",JOptionPane.ERROR_MESSAGE);
             }
         }
+    }
+    private void updateSelectedApplication(){
+        int selectedRow = applicationTable.getSelectedRow();
+        if(selectedRow == -1){
+            confirmationLabel.setText("No application selected to update");
+            JOptionPane.showMessageDialog(applicationTable,"Select an application before clicking update","No application selected",JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        int modelRow = applicationTable.convertRowIndexToModel(selectedRow);
+        int applicationID = (int) tableModel.getValueAt(modelRow,0);
+        JobApplication currentApplication = applicationService.findApplicationById(applicationID);
+        if(currentApplication == null){
+            confirmationLabel.setText("Application not found");
+            JOptionPane.showMessageDialog(applicationTable,"Application not found","Update failed",JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        JTextField companyField = new JTextField(currentApplication.getCompany());
+        JTextField positionField = new JTextField(currentApplication.getPosition());
+        JTextField salaryField = new JTextField(String.valueOf(currentApplication.getSalary()));
+        JTextField locationField = new JTextField(currentApplication.getLocation());
+        JTextField applicationDateField = new JTextField(currentApplication.getApplicationDate().toString().replace("-","/"));
+        JTextField urlField = new JTextField(currentApplication.getApplicationUrl());
+        JComboBox<String> statusBox = new JComboBox<>();
+        statusBox.addItem("Applied");
+        statusBox.addItem("Awaiting response");
+        statusBox.addItem("Interviewing");
+        statusBox.addItem("In Progress");
+        statusBox.addItem("Denied");
+        statusBox.setSelectedItem(currentApplication.getStatus().getDisplayName());
+
+        JComboBox<String> workStructureBox = new JComboBox<>();
+        workStructureBox.addItem("Onsite");
+        workStructureBox.addItem("Remote");
+        workStructureBox.addItem("Hybrid");
+        workStructureBox.setSelectedItem(currentApplication.getWorkStructure().getDisplayName());
+        JPanel formPanel = new JPanel(new GridLayout(0,2,10,10));
+        formPanel.add(new JLabel("Company"));
+        formPanel.add(companyField);
+        formPanel.add(new JLabel("Position"));
+        formPanel.add(positionField);
+        formPanel.add(new JLabel("Status: "));
+        formPanel.add(statusBox);
+        formPanel.add(new JLabel("Salary: "));
+        formPanel.add(salaryField);
+        formPanel.add(new JLabel("Location"));
+        formPanel.add(locationField);
+        formPanel.add(new JLabel("Work Structure: "));
+        formPanel.add(workStructureBox);
+        formPanel.add(new JLabel("Application Date yyyy/MM/dd"));
+        formPanel.add(applicationDateField);
+        formPanel.add(new JLabel("Optional Application URL"));
+        formPanel.add(urlField);
+        int result = JOptionPane.showConfirmDialog(applicationTable,formPanel,"Update Application",JOptionPane.OK_CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION){
+            try{
+                String company = companyField.getText().trim();
+                String position = positionField.getText().trim();
+                String salaryText = salaryField.getText().trim();
+                String location = locationField.getText().trim();
+                String applicationDateText = applicationDateField.getText().trim();
+                String applicationUrl = urlField.getText().trim();
+                double salary = Double.parseDouble(salaryText);
+
+                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+                LocalDate applicationDate = LocalDate.parse(applicationDateText,dateFormatter);
+                ApplicationStatus status = ApplicationStatus.fromString(statusBox.getSelectedItem().toString());
+                WorkStructure workStructure = WorkStructure.fromString(workStructureBox.getSelectedItem().toString());
+                JobApplication updatedApplication = new JobApplication(applicationID,company,position,status,salary,location,workStructure,applicationDate,
+                        LocalDate.now(),applicationUrl,false);
+                boolean updated = applicationService.updateApplication(updatedApplication);
+                if(updated){
+                    refreshTable();
+                    confirmationLabel.setText("Application Updated");
+                }
+                else{
+                    confirmationLabel.setText("Application Could not be updated");
+                    JOptionPane.showMessageDialog(applicationTable,"Application was not updated, application must remain unique, no blank fields, no negative salary, or future dates","Update Failed",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
+            catch(NumberFormatException e){
+                confirmationLabel.setText("Application could not be updated");
+                JOptionPane.showMessageDialog(applicationTable,"Salary must be a valid positive number","Invalid salary",JOptionPane.ERROR_MESSAGE);
+            }
+            catch(DateTimeParseException e){
+                confirmationLabel.setText("Application could not be updated");
+                JOptionPane.showMessageDialog(applicationTable,"Application date uses yyyy/MM/dd formatting","Invalid Date",JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
     }
 }
