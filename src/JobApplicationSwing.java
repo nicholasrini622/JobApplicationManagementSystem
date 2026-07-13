@@ -1,9 +1,12 @@
 import javax.swing.table.DefaultTableModel;
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 public class JobApplicationSwing {
     private ApplicationService applicationService;
@@ -11,6 +14,7 @@ public class JobApplicationSwing {
     private DefaultTableModel tableModel;
     private JLabel confirmationLabel;
     private JLabel followUpLabel;
+    private ImportService importService;
     public static void main(String[] args){
         SwingUtilities.invokeLater(() ->{
             JobApplicationSwing app = new JobApplicationSwing();
@@ -20,6 +24,7 @@ public class JobApplicationSwing {
     }
     private void createGUI(){
         applicationService = new ApplicationService(7);
+        importService = new ImportService(applicationService);
         JFrame frame = new JFrame("Job Application Management System");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1000,600);
@@ -46,6 +51,17 @@ public class JobApplicationSwing {
             Object[] rowData = { application.getApplicationID(),application.getCompany(),application.getPosition(),application.getStatus().getDisplayName(),
                     application.getSalary(),application.getLocation(),application.getWorkStructure().getDisplayName(),application.getApplicationDate(),
             application.getLastUpdatedDate(),application.getApplicationUrl()
+            };
+            tableModel.addRow(rowData);
+        }
+        applicationTable.clearSelection();
+    }
+    public void refreshTable(ArrayList<JobApplication> displayApplications){
+        tableModel.setRowCount(0);
+        for(JobApplication application : displayApplications){
+            Object[] rowData = { application.getApplicationID(),application.getCompany(),application.getPosition(),application.getStatus().getDisplayName(),
+                    application.getSalary(),application.getLocation(),application.getWorkStructure().getDisplayName(),application.getApplicationDate(),
+                    application.getLastUpdatedDate(),application.getApplicationUrl()
             };
             tableModel.addRow(rowData);
         }
@@ -84,12 +100,18 @@ public class JobApplicationSwing {
         sortBy.addItem("Date");
 
         JButton apply = new JButton("Apply Changes");
-        apply.addActionListener(event ->{ confirmationLabel.setText("Filter and sort selected.");});
+        apply.addActionListener(event -> {filterAndSort(statusFilter,sortBy);});
+        JButton defaultViewButton = new JButton("Reset to default");
+        defaultViewButton.addActionListener(event -> {statusFilter.setSelectedItem("Statuses");
+        sortBy.setSelectedItem("Company");
+        refreshTable();
+        confirmationLabel.setText("View reset to default.");});
         filterPanel.add(new JLabel("Filter by Status"));
         filterPanel.add(statusFilter);
         filterPanel.add(new JLabel("Sort by"));
         filterPanel.add(sortBy);
         filterPanel.add(apply);
+        filterPanel.add(defaultViewButton);
         topPanel.add(titleLabel,BorderLayout.NORTH);
         topPanel.add(filterPanel,BorderLayout.SOUTH);
         return topPanel;
@@ -110,7 +132,7 @@ public class JobApplicationSwing {
         buttonPanel.add(followUpButton);
         addButton.addActionListener(event ->{openAddApplicationForm();
         });
-        importButton.addActionListener(event -> {confirmationLabel.setText("Import File clicked");});
+        importButton.addActionListener(event -> importApplicationFile());
         updateButton.addActionListener(event ->updateSelectedApplication());
         removeButton.addActionListener(event ->removeSelectedApplication());
         followUpButton.addActionListener(event ->{followUpLabel.setText("Follow Up Alerts Clicked");});
@@ -313,5 +335,40 @@ public class JobApplicationSwing {
             }
         }
 
+    }
+    private void importApplicationFile(){
+        JFileChooser filePicker = new JFileChooser();
+        int result = filePicker.showOpenDialog(applicationTable);
+        if(result == JFileChooser.APPROVE_OPTION){
+            File fileChoice = filePicker.getSelectedFile();
+            importService.importApplications(fileChoice.getAbsolutePath());
+            refreshTable();
+            int skippedRecord = importService.getInvalidRecordCount();
+            confirmationLabel.setText("Import successful. Records skipped - " + skippedRecord);
+            JOptionPane.showMessageDialog(applicationTable,"Import successful.  Records skipped - " + skippedRecord,"Import successful",
+                    JOptionPane.INFORMATION_MESSAGE);
+        }
+        else{
+            confirmationLabel.setText("Import was cancelled");
+        }
+    }
+    private void filterAndSort(JComboBox<String> statusFilter, JComboBox<String> sortField){
+        String statusChoice = statusFilter.getSelectedItem().toString();
+        String sortChoice = sortField.getSelectedItem().toString();
+        ArrayList<JobApplication> displayApplications;
+        if (statusChoice.equals("Statuses")) {
+            displayApplications = new ArrayList<>(applicationService.getAllApplications());
+        } else {
+            ApplicationStatus status = ApplicationStatus.fromString(statusChoice);
+            displayApplications = applicationService.filterByStatus(status);
+        }
+        switch (sortChoice) {
+            case "Position" -> displayApplications.sort(Comparator.comparing(JobApplication::getPosition));
+            case "Salary" -> displayApplications.sort(Comparator.comparing(JobApplication::getSalary));
+            case "Date" -> displayApplications.sort(Comparator.comparing(JobApplication::getApplicationDate));
+            default -> displayApplications.sort(Comparator.comparing(JobApplication::getCompany));
+        }
+        refreshTable(displayApplications);
+        confirmationLabel.setText("Displaying " + displayApplications.size() + "records. Filter: " + statusChoice + ", Sort: " + sortChoice);
     }
 }
