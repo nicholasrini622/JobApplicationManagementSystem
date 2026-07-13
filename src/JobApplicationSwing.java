@@ -198,10 +198,17 @@ public class JobApplicationSwing {
                 String location = locationField.getText().trim();
                 String applicationDateText = applicationDateField.getText().trim();
                 String applicationUrl = urlField.getText().trim();
+                String validMessage = validateApplication(company,position,salaryText,location,applicationDateText);
+                if(validMessage != null){
+                    confirmationLabel.setText("Application not added");
+                    JOptionPane.showMessageDialog(applicationTable,validMessage,"Invalid input",JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 double salary = Double.parseDouble(salaryText);
 
+
                 DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-                LocalDate applicationDate = LocalDate.parse(applicationDateText,dateFormatter);
+                LocalDate applicationDate = parseDate(applicationDateText);
                 ApplicationStatus status = ApplicationStatus.fromString(statusBox.getSelectedItem().toString());
                 WorkStructure workStructure = WorkStructure.fromString(workStructureBox.getSelectedItem().toString());
                 JobApplication newApplication = new JobApplication(0,company,position,status,salary,location,workStructure,applicationDate,LocalDate.now(),
@@ -316,10 +323,16 @@ public class JobApplicationSwing {
                 String location = locationField.getText().trim();
                 String applicationDateText = applicationDateField.getText().trim();
                 String applicationUrl = urlField.getText().trim();
+                String validMessage = validateApplication(company,position,salaryText,location,applicationDateText);
+                if(validMessage != null){
+                    confirmationLabel.setText("Application not added");
+                    JOptionPane.showMessageDialog(applicationTable,validMessage,"Invalid input",JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 double salary = Double.parseDouble(salaryText);
 
                 DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-                LocalDate applicationDate = LocalDate.parse(applicationDateText,dateFormatter);
+                LocalDate applicationDate = parseDate(applicationDateText);
                 ApplicationStatus status = ApplicationStatus.fromString(statusBox.getSelectedItem().toString());
                 WorkStructure workStructure = WorkStructure.fromString(workStructureBox.getSelectedItem().toString());
                 JobApplication updatedApplication = new JobApplication(applicationID,company,position,status,salary,location,workStructure,applicationDate,
@@ -456,5 +469,12 @@ public class JobApplicationSwing {
             return "Date does not exist.";
         }
         return null;
+    }
+    private LocalDate parseDate(String applicationComponents){
+        String[] dateComponent = applicationComponents.split("/");
+        int year = Integer.parseInt(dateComponent[0]);
+        int month = Integer.parseInt(dateComponent[1]);
+        int day = Integer.parseInt(dateComponent[2]);
+        return LocalDate.of(year,month,day);
     }
 }
