@@ -125,7 +125,9 @@ public class JobApplicationSwing {
     }
     private JPanel bottomPanel(){
         JPanel bottomPanel = new JPanel(new BorderLayout());
-        JPanel buttonPanel = new JPanel(new GridLayout(1,5));
+        JPanel buttonPanel = new JPanel(new GridLayout(1,6));
+        JButton exitButton = new JButton("Exit");
+        exitButton.setToolTipText("Closes the application");
         JButton addButton = new JButton("Add Application");
         JButton importButton = new JButton("Import File");
         JButton updateButton = new JButton("Update application");
@@ -140,12 +142,19 @@ public class JobApplicationSwing {
         buttonPanel.add(updateButton);
         buttonPanel.add(removeButton);
         buttonPanel.add(followUpButton);
+        buttonPanel.add(exitButton);
         addButton.addActionListener(event ->{openAddApplicationForm();
         });
         importButton.addActionListener(event -> importApplicationFile());
         updateButton.addActionListener(event ->updateSelectedApplication());
         removeButton.addActionListener(event ->removeSelectedApplication());
         followUpButton.addActionListener(event ->showFollowUp());
+        exitButton.addActionListener(event -> {
+            int confirmation = JOptionPane.showConfirmDialog(applicationTable,"Would you like to confirm","Exit",JOptionPane.YES_NO_OPTION);
+            if(confirmation == JOptionPane.YES_OPTION){
+                System.exit(0);
+            }
+        });
         confirmationLabel = new JLabel("Confirmation Message Here");
         followUpLabel = new JLabel("Follow Up Alert here");
         JPanel messagePanel = new JPanel(new GridLayout(1,2));
