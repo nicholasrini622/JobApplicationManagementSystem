@@ -135,7 +135,7 @@ public class JobApplicationSwing {
         importButton.addActionListener(event -> importApplicationFile());
         updateButton.addActionListener(event ->updateSelectedApplication());
         removeButton.addActionListener(event ->removeSelectedApplication());
-        followUpButton.addActionListener(event ->{followUpLabel.setText("Follow Up Alerts Clicked");});
+        followUpButton.addActionListener(event ->showFollowUP());
         confirmationLabel = new JLabel("Confirmation Message Here");
         followUpLabel = new JLabel("Follow Up Alert here");
         JPanel messagePanel = new JPanel(new GridLayout(1,2));
@@ -370,5 +370,17 @@ public class JobApplicationSwing {
         }
         refreshTable(displayApplications);
         confirmationLabel.setText("Displaying " + displayApplications.size() + "records. Filter: " + statusChoice + ", Sort: " + sortChoice);
+    }
+    private void showFollowUP(){
+        ArrayList<JobApplication> followUpApplications = applicationService.getFollowUpApplications();
+        if(followUpApplications.isEmpty()){
+            followUpLabel.setText("No alerts to display");
+            JOptionPane.showMessageDialog(applicationTable,"No applications need follow-up","Follow-Up Alerts",JOptionPane.INFORMATION_MESSAGE);
+            refreshTable();
+            return;
+        }
+        refreshTable(followUpApplications);
+        followUpLabel.setText(followUpApplications.size() + " need a follow-up");
+        JOptionPane.showMessageDialog(applicationTable,followUpApplications.size() + " should be followed up ","Follow-Up alerts",JOptionPane.WARNING_MESSAGE);
     }
 }
