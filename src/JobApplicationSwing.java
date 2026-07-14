@@ -17,10 +17,10 @@ public class JobApplicationSwing {
     private JLabel confirmationLabel;
     private JLabel followUpLabel;
     private ImportService importService;
-    private final Color HEADER_COLOR = new Color(31,41,55);
-    private final Color BACKGROUND_COLOR = new Color(243,244,246);
-    private final Color SUCCESS_COLOR = new Color(22,101,52);
-    private final Color WARNING_COLOR = new Color(146,64,14);
+    private final Color HEADER_COLOR = new Color(20,50,90);
+    private final Color BACKGROUND_COLOR = new Color(240,240,240);
+    private final Color SUCCESS_COLOR = Color.GREEN;
+    private final Color WARNING_COLOR = Color.ORANGE;
     public static void main(String[] args){
         SwingUtilities.invokeLater(() ->{
             JobApplicationSwing app = new JobApplicationSwing();
@@ -28,6 +28,12 @@ public class JobApplicationSwing {
         });
 
     }
+    /*
+    Method: createGUI()
+    Purpose: Creates the main window and panels
+    Parameters: None
+    Return: Void
+     */
     private void createGUI(){
         applicationService = new ApplicationService(7);
         importService = new ImportService(applicationService);
@@ -45,13 +51,12 @@ public class JobApplicationSwing {
         frame.setVisible(true);
 
     }
-    private void addTestApplication(){
-        JobApplication testApplication = new JobApplication(
-                1,"Orlando Health","Data quality",ApplicationStatus.APPLIED,75000,"Orlando",WorkStructure.HYBRID, LocalDate.now().minusDays(1),LocalDate.now(),
-                "",false
-        );
-        applicationService.addApplication(testApplication);
-    }
+    /*
+    Method: refreshTable()
+    Purpose: Refreshes the table to display all records from ApplicationService
+    Parameters: None
+    Return: void
+     */
     public void refreshTable(){
         tableModel.setRowCount(0);
         for(JobApplication application : applicationService.getAllApplications()){
@@ -63,6 +68,12 @@ public class JobApplicationSwing {
         }
         applicationTable.clearSelection();
     }
+    /*
+    Method: Overloaded refreshTable
+    Purpose: Refresh table with a specific list
+    ParametersL ArrayList<JobApplication> displayApplications
+    Return: void
+     */
     public void refreshTable(ArrayList<JobApplication> displayApplications){
         tableModel.setRowCount(0);
         for(JobApplication application : displayApplications){
@@ -74,6 +85,12 @@ public class JobApplicationSwing {
         }
         applicationTable.clearSelection();
     }
+    /*
+    Method: createTable
+    Purpose: Creates the table that displays job application information
+    Parameters: None
+    Return: JScrollpane
+     */
     public JScrollPane createTable(){
         String[] columns = {
                 "ID","Company","Position","Status","Salary","Location","Work Structure","Application Date","Recently Updated Date"
@@ -88,11 +105,18 @@ public class JobApplicationSwing {
         applicationTable.setToolTipText("Select a row to Update or Remove application");
         return new JScrollPane(applicationTable);
     }
+    /*
+    Method: createTopPanel
+    Purpose: Creates the top panel that contains, title, filter and sort dropdowns, apply button, and reset defaults
+    Parameters: None
+    Return: JPanel
+     */
     private JPanel createTopPanel(){
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(HEADER_COLOR);
         JLabel titleLabel = new JLabel("Job Application Record Management System");
         titleLabel.setFont(new Font("Verdana",Font.BOLD,20));
+        titleLabel.setForeground(Color.WHITE);
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         filterPanel.setBackground(HEADER_COLOR);
         JComboBox<String> statusFilter = new JComboBox<>();
@@ -119,9 +143,13 @@ public class JobApplicationSwing {
         sortBy.setSelectedItem("Company");
         refreshTable();
         confirmationLabel.setText("View reset to default.");});
-        filterPanel.add(new JLabel("Filter by Status"));
+        JLabel filterStatusLabel = new JLabel("Filter by Status");
+        filterStatusLabel.setForeground(Color.WHITE);
+        filterPanel.add(filterStatusLabel);
         filterPanel.add(statusFilter);
-        filterPanel.add(new JLabel("Sort by"));
+        JLabel sortByLabel = new JLabel("Sort by");
+        sortByLabel.setForeground(Color.WHITE);
+        filterPanel.add(sortByLabel);
         filterPanel.add(sortBy);
         filterPanel.add(apply);
         filterPanel.add(defaultViewButton);
@@ -130,6 +158,12 @@ public class JobApplicationSwing {
         return topPanel;
 
     }
+    /*
+    Method: bottomPanel
+    Purpose: creates the bottom panel with our CRUD buttons and messaging
+    Parameters: None
+    Return: void
+     */
     private JPanel bottomPanel(){
         JPanel bottomPanel = new JPanel(new BorderLayout());
         JPanel buttonPanel = new JPanel(new GridLayout(1,6));
@@ -173,6 +207,12 @@ public class JobApplicationSwing {
         bottomPanel.add(messagePanel,BorderLayout.SOUTH);
         return bottomPanel;
     }
+    /*
+    Method: openAddApplicationForm
+    Purpose: opens the add application form, validates input, and adds a record
+    Parameters: None
+    return: void
+     */
     private void openAddApplicationForm(){
         JTextField companyField = new JTextField();
         JTextField positionField = new JTextField();
@@ -255,6 +295,12 @@ public class JobApplicationSwing {
         }
 
     }
+    /*
+    Method: removeSelectedApplication
+    Purpose: removes a selected application after confirmation
+    Parameters: None
+    Return: void
+     */
     private void removeSelectedApplication(){
         int selectedRow = applicationTable.getSelectedRow();
         if(selectedRow == -1){
@@ -280,6 +326,12 @@ public class JobApplicationSwing {
             }
         }
     }
+    /*
+    Method: updateSelectedApplication
+    Purpose: updates a selected application and saves updates
+    Parameters: None
+    Return: void
+     */
     private void updateSelectedApplication(){
         int selectedRow = applicationTable.getSelectedRow();
         if(selectedRow == -1){
@@ -377,6 +429,12 @@ public class JobApplicationSwing {
         }
 
     }
+    /*
+    Method: importApplicationFile
+    Purpose: Imports a file from file picker, file must be .txt.  Sends file path to importservice class
+    Parameters: none
+    Return: void
+     */
     private void importApplicationFile(){
         JFileChooser filePicker = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Text Files (*.txt)", "txt");
@@ -401,6 +459,12 @@ public class JobApplicationSwing {
             confirmationLabel.setText("Import was cancelled");
         }
     }
+    /*
+    Method: filterAndASort
+    Purpose: Applies the selected filter and/or sort
+    Parameters: JComboBox<String> statusFilter, JComboBox<String> sort field)
+    Return: void
+     */
     private void filterAndSort(JComboBox<String> statusFilter, JComboBox<String> sortField){
         String statusChoice = statusFilter.getSelectedItem().toString();
         String sortChoice = sortField.getSelectedItem().toString();
@@ -420,6 +484,12 @@ public class JobApplicationSwing {
         refreshTable(displayApplications);
         confirmationLabel.setText("Displaying " + displayApplications.size() + "records. Filter: " + statusChoice + ", Sort: " + sortChoice);
     }
+    /*
+    Method: showFollowUp
+    Purpose: display applications that might need a follow-up using ApplicationService follow-up
+    Parameters: none
+    Return: void
+     */
     private void showFollowUp(){
         ArrayList<JobApplication> followUpApplications = applicationService.getFollowUpApplications();
         if(followUpApplications.isEmpty()){
@@ -432,6 +502,12 @@ public class JobApplicationSwing {
         followUpLabel.setText(followUpApplications.size() + " need a follow-up");
         JOptionPane.showMessageDialog(applicationTable,followUpApplications.size() + " should be followed up ","Follow-Up alerts",JOptionPane.WARNING_MESSAGE);
     }
+    /*
+    Method: validateApplication
+    Purpose: validate all user input from add and update forms.  Display appropriate message
+    Parameters: String comapny, String position, String salaryText, String location, String applicationDate
+    Return: String
+     */
     private String validateApplication(String company, String position, String salaryText, String location, String applicationDate){
         if(company.isBlank()){
             return "Company can not be left empty";
@@ -488,6 +564,12 @@ public class JobApplicationSwing {
         }
         return null;
     }
+    /*
+   Method: parseDate
+   Purpose: Convert a String date to LocalDate
+   Parameters: String applicationComponents
+   Return: void
+     */
     private LocalDate parseDate(String applicationComponents){
         String[] dateComponent = applicationComponents.split("/");
         int year = Integer.parseInt(dateComponent[0]);
