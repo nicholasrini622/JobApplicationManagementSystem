@@ -17,6 +17,10 @@ public class JobApplicationSwing {
     private JLabel confirmationLabel;
     private JLabel followUpLabel;
     private ImportService importService;
+    private final Color HEADER_COLOR = new Color(31,41,55);
+    private final Color BACKGROUND_COLOR = new Color(243,244,246);
+    private final Color SUCCESS_COLOR = new Color(22,101,52);
+    private final Color WARNING_COLOR = new Color(146,64,14);
     public static void main(String[] args){
         SwingUtilities.invokeLater(() ->{
             JobApplicationSwing app = new JobApplicationSwing();
@@ -32,6 +36,7 @@ public class JobApplicationSwing {
         frame.setSize(1000,600);
         frame.setLocationRelativeTo(null);
         frame.setLayout(new BorderLayout());
+        frame.getContentPane().setBackground(BACKGROUND_COLOR);
         frame.add(createTopPanel(),BorderLayout.NORTH);
         frame.add(createTable(),BorderLayout.CENTER);
         frame.add(bottomPanel(),BorderLayout.SOUTH);
@@ -85,9 +90,11 @@ public class JobApplicationSwing {
     }
     private JPanel createTopPanel(){
         JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBackground(HEADER_COLOR);
         JLabel titleLabel = new JLabel("Job Application Record Management System");
         titleLabel.setFont(new Font("Verdana",Font.BOLD,20));
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        filterPanel.setBackground(HEADER_COLOR);
         JComboBox<String> statusFilter = new JComboBox<>();
         statusFilter.addItem("Statuses");
         statusFilter.addItem("Applied");
@@ -160,6 +167,8 @@ public class JobApplicationSwing {
         JPanel messagePanel = new JPanel(new GridLayout(1,2));
         messagePanel.add(confirmationLabel);
         messagePanel.add(followUpLabel);
+        confirmationLabel.setForeground(SUCCESS_COLOR);
+        followUpLabel.setForeground(WARNING_COLOR);
         bottomPanel.add(buttonPanel,BorderLayout.NORTH);
         bottomPanel.add(messagePanel,BorderLayout.SOUTH);
         return bottomPanel;
