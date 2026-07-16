@@ -35,6 +35,7 @@ public class JobApplicationSwing {
     Return: Void
      */
     private void createGUI(){
+        DBHelper.initializeDatabase();
         applicationService = new ApplicationService(7);
         importService = new ImportService(applicationService);
         JFrame frame = new JFrame("Job Application Management System");
@@ -554,6 +555,9 @@ public class JobApplicationSwing {
                 return "Time to retire.  Application is over 100 years old.";
             }
             LocalDate applicationDateEdit = LocalDate.of(year,month,day);
+            if(applicationDateEdit.isAfter(LocalDate.now())){
+                return "Application date can not be from the future!";
+            }
 
         }
         catch(NumberFormatException e){

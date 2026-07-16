@@ -1,0 +1,36 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class DBHelper {
+    private static final String DATABASE_URL = "jdbc:sqlite:job_applications.db";
+    public static Connection getConnection() throws SQLException{
+        return DriverManager.getConnection(DATABASE_URL);
+    }
+    public static void initializeDatabase(){
+        String createTableSQL = """
+                CREATE TABLE IF NOT EXISTS job_applications(
+                application_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company TEXT NOT NULL,
+                position TEXT NOT NULL,
+                status TEXT NOT NULL,
+                salary REAL NOT NULL,
+                location TEXT NOT NULL,
+                work_structure TEXT NOT NULL,
+                application_date TEXT NOT NULL,
+                last_updated_date TEXT NOT NULL,
+                application_url TEXT,
+                follow_up_needed INTEGER NOT NULL DEFAULT 0,
+                UNIQUE(company,position))""";
+
+    try(Connection connection = getConnection();
+    Statement statement = connection.createStatement()){
+        statement.execute(createTableSQL);
+    }
+    catch (SQLException e){
+        System.out.println("Database not loaded");
+        System.out.println(e.getMessage());
+    }
+    }
+}

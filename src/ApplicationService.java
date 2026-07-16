@@ -12,16 +12,16 @@ import java.util.Collections;
 import java.util.Comparator;
 
 public class ApplicationService {
-    private ArrayList<JobApplication> applications;
     private int followUpLimit;
+    private JobApplicationRepository repository;
 
     public ApplicationService(int followUpLimit) {
-        applications = new ArrayList<>();
         if (followUpLimit > 0) {
             this.followUpLimit = followUpLimit;
         } else {
             this.followUpLimit = 7;
         }
+        this.repository = new JobApplicationRepository();
     }
 /*
 Method: validateApplication
@@ -52,13 +52,11 @@ Parameters: JobApplication application
 Return:  Boolean - true if application record is added, false if invalid or non-unique.
  */
     public boolean addApplication(JobApplication application) {
-        if (!validateApplication(application) || isDuplicateApplication(application)) {
+        if (!validateApplication(application) || isDuplicateApplication(application,0)) {
             return false;
         }
-        application.setApplicationID(createApplicationID());
         application.setLastUpdatedDate(LocalDate.now());
-        applications.add(application);
-        return true;
+        return repository.addApplication(application);
     }
 /*
 Method: updateApplication
@@ -74,23 +72,13 @@ Return: boolean - true if record was updated, false if the record was invalid, a
         if (currentApplication == null) {
             return false;
         }
-        for (JobApplication app : applications) {
-            if (app.getApplicationID() != application.getApplicationID()) {
-                if (app.getCompany().equalsIgnoreCase(application.getCompany()) && app.getPosition().equalsIgnoreCase(application.getPosition())) {
-                    return false;
-                }
+        if(isDuplicateApplication(application, application.getApplicationID())){
+            return false;
             }
+        application.setLastUpdatedDate(LocalDate.now());
+        return repository.updateApplication(application);
         }
-        currentApplication.setCompany(application.getCompany());
-        currentApplication.setPosition(application.getPosition());
-        currentApplication.setLocation(application.getLocation());
-        currentApplication.setStatus(application.getStatus());
-        currentApplication.setWorkStructure(application.getWorkStructure());
-        currentApplication.setSalary(application.getSalary());
-        currentApplication.setApplicationDate(application.getApplicationDate());
-        currentApplication.setLastUpdatedDate(LocalDate.now());
-        return true;
-    }
+
 /*
 Method: removeAppplication
 Purpose:  Remove  a jobApplication record from the list based on applicationID
@@ -102,8 +90,7 @@ Return: boolean - true if application was removed, false if there isn't a matchi
         if (application == null) {
             return false;
         }
-        applications.remove(application);
-        return true;
+        return repository.removeApplication(applicationID);
     }
 /*
 Method: findApplicationById
@@ -112,12 +99,7 @@ Parameters: int applicationID
 Returns; JobApplication or null if no match
  */
     public JobApplication findApplicationById(int applicationID) {
-        for (JobApplication application : applications) {
-            if (application.getApplicationID() == applicationID) {
-                return application;
-            }
-        }
-        return null;
+        return repository.findApplication(applicationID);
     }
 /*
 Method: getAllApplications()
@@ -126,7 +108,7 @@ Parameter: None
 Return:  ArrayList<JobApplication>
  */
     public ArrayList<JobApplication> getAllApplications() {
-        return applications;
+        return repository.getAllApplications();
     }
 /*
 Method: createApplicationID()
@@ -134,6 +116,7 @@ Purpose:  Finds the highest current ID and adds one to create next application I
 Parameters: None
 Return: int
  */
+    /*
     private int createApplicationID() {
         int maxID = 0;
         for (JobApplication application : applications) {
@@ -143,6 +126,8 @@ Return: int
         }
         return maxID + 1;
     }
+    */
+
 /*
 Method: sortApplications
 Purpose: Create a sorted application record list copy based on a selected field
@@ -150,7 +135,7 @@ Parameters: String sortField
 Return: sorted ArrayList<JobApplication>
  */
     public ArrayList<JobApplication> sortApplications(String sortField) {
-        ArrayList<JobApplication> sortedList = new ArrayList<>(applications);
+        ArrayList<JobApplication> sortedList = new ArrayList<>(getAllApplications());
         if (sortField == null || sortField.isBlank()) {
             return sortedList;
         }
@@ -203,7 +188,7 @@ Return: filtered ArrayList<JobApplication>
  */
     public ArrayList<JobApplication> filterByStatus(ApplicationStatus status){
         ArrayList<JobApplication> filterList = new ArrayList<>();
-        for(JobApplication application: applications){
+        for(JobApplication application: getAllApplications()){
             if(application.getStatus() == status){
                 filterList.add(application);
             }
@@ -216,9 +201,12 @@ Purpose: Check if an existing application already has the same company and posit
 Parameters: JobApplication applicationCopy
 Return: boolean - true if duplicate is found, false if no duplicate is found.
  */
-    private boolean isDuplicateApplication(JobApplication applicationCopy) {
-        for (JobApplication application : applications) {
-            if (application.getCompany().equalsIgnoreCase(applicationCopy.getCompany()) && application.getPosition().equalsIgnoreCase(applicationCopy.getPosition())) {
+    private boolean isDuplicateApplication(JobApplication applicationCopy, int currentApplicationID) {
+        for (JobApplication application : getAllApplications()) {
+            boolean sameCompany = application.getCompany().equalsIgnoreCase(applicationCopy.getCompany());
+            boolean samePosition = application.getPosition().equalsIgnoreCase(applicationCopy.getPosition());
+            boolean otherApplication = application.getApplicationID() != currentApplicationID;
+            if(sameCompany && samePosition && otherApplication){
                 return true;
             }
         }
@@ -246,7 +234,7 @@ Return: ArrayList<JobApplication> records that need a follow-up.
  */
     public ArrayList<JobApplication> getFollowUpApplications(){
         ArrayList<JobApplication> followUp = new ArrayList<>();
-        for(JobApplication application : applications){
+        for(JobApplication application : getAllApplications()){
             if(application != null){
                 if(isFollowUpNeeded(application)){
                     application.setFollowUpNeeded(true);
