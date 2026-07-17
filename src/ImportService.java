@@ -33,7 +33,7 @@ Return: ArrayList<JobApplication> of imported applications
         ArrayList<JobApplication> importList = new ArrayList<>();
         invalidRecordCount = 0;
         if (filePath == null || filePath.isBlank()) {
-            System.out.println("Error in file path.  File path cannot be empty.");
+            System.out.println(" Error in file path.  File path cannot be empty.");
             return importList;
         }
         try {
@@ -49,7 +49,7 @@ Return: ArrayList<JobApplication> of imported applications
                         importList.add(application);
                     } else {
                         invalidRecordCount++;
-                        System.out.println("Row Skipped: " + rowNumber + "Invalid or duplicate record");
+                        System.out.println("Row Skipped: " + rowNumber + " Invalid or duplicate record");
                     }
                 } catch (InvalidImportException e) {
                     invalidRecordCount++;
@@ -70,7 +70,7 @@ Return: JobApplication
  */
             public JobApplication parseApplicationLine (String line) throws InvalidImportException {
                 if (!validateFile(line)) {
-                    throw new InvalidImportException("A job application Record row must have 7 fields");
+                    throw new InvalidImportException(" A job application Record row must have 7 fields");
                 }
                 String[] parts = line.split(",");
                 String company = parts[0].trim();
@@ -80,10 +80,10 @@ Return: JobApplication
                 try {
                     salary = Double.parseDouble(parts[3].trim());
                     if (salary < 0) {
-                        throw new InvalidImportException("Salary can't be a negative value");
+                        throw new InvalidImportException(" Salary can't be a negative value");
                     }
                 } catch (NumberFormatException e) {
-                    throw new InvalidImportException("Salary is an invalid number");
+                    throw new InvalidImportException(" Salary is an invalid number");
                 }
                 String location = parts[4].trim();
                 WorkStructure workStructure = WorkStructure.fromString(parts[5].trim());
@@ -97,14 +97,14 @@ Return: JobApplication
                         applicationDate = LocalDate.parse(dateDisplay);
                     }
                 } catch (DateTimeParseException e) {
-                    throw new InvalidImportException("Invalid date format. Use yyyy/MM/dd");
+                    throw new InvalidImportException(" Invalid date format. Use yyyy/MM/dd");
                 }
                 String applicationUrl = "";
                 if (parts.length >= 8) {
                     applicationUrl = parts[7].trim();
                 }
                 if (status == null || workStructure == null) {
-                    throw new InvalidImportException("Invalid application status or work structure");
+                    throw new InvalidImportException(" Invalid application status or work structure");
                 }
                 return new JobApplication(0, company, position, status, salary, location, workStructure, applicationDate, LocalDate.now(), applicationUrl, false);
             }

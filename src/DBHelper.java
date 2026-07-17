@@ -4,11 +4,19 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DBHelper {
-    private static final String DATABASE_URL = "jdbc:sqlite:job_applications.db";
-    public static Connection getConnection() throws SQLException{
-        return DriverManager.getConnection(DATABASE_URL);
+    private static String databasePath = "job_applications.db";
+    public static void setDatabasePath(String newPath){
+        if(newPath != null && !newPath.isBlank()){
+        databasePath = newPath.replace("\\","/");
+        }
     }
-    public static void initializeDatabase(){
+    public static String getDatabasePath(){
+        return databasePath;
+    }
+    public static Connection getConnection() throws SQLException{
+        return DriverManager.getConnection("jdbc:sqlite:" + databasePath);
+    }
+    public static boolean initializeDatabase(){
         String createTableSQL = """
                 CREATE TABLE IF NOT EXISTS job_applications(
                 application_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,10 +35,12 @@ public class DBHelper {
     try(Connection connection = getConnection();
     Statement statement = connection.createStatement()){
         statement.execute(createTableSQL);
+        return true;
     }
     catch (SQLException e){
         System.out.println("Database not loaded");
         System.out.println(e.getMessage());
+        return false;
     }
     }
 }
