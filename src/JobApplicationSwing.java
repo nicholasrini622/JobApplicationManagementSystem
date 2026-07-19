@@ -42,9 +42,6 @@ public class JobApplicationSwing {
     Return: Void
      */
     private void createGUI() {
-        DBHelper.initializeDatabase();
-        applicationService = new ApplicationService(7);
-        importService = new ImportService(applicationService);
         frame = new JFrame("Job Application Management System");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1000, 600);
@@ -52,7 +49,6 @@ public class JobApplicationSwing {
         cardLayout = new CardLayout();
         screenPanel = new JPanel(cardLayout);
         screenPanel.add(createStartPanel(), "START");
-        screenPanel.add(createMainPanel(), "MAIN");
         frame.add(screenPanel);
         frame.setVisible(true);
 
@@ -491,8 +487,7 @@ public class JobApplicationSwing {
             DBHelper.setDatabasePath(databaseChoice.getAbsolutePath());
             boolean databaseInitialized = DBHelper.initializeDatabase();
             if (databaseInitialized) {
-                refreshTable();
-                cardLayout.show(screenPanel, "MAIN");
+                mainScreen();
                 confirmationLabel.setText("Database was loaded: " + databaseChoice.getName());
                 JOptionPane.showMessageDialog(applicationTable, "Database loaded", "Database loaded", JOptionPane.INFORMATION_MESSAGE);
             } else {
@@ -672,8 +667,7 @@ public class JobApplicationSwing {
         defaultDatabase.addActionListener(event -> {
             boolean dataBaseInitialized = DBHelper.initializeDatabase();
             if (dataBaseInitialized) {
-                refreshTable();
-                cardLayout.show(screenPanel, "MAIN");
+                mainScreen();
                 confirmationLabel.setText("Default database: " + DBHelper.getDatabasePath());
             } else {
                 JOptionPane.showMessageDialog(frame, "Database not loaded", "Database load error", JOptionPane.ERROR_MESSAGE);
@@ -695,5 +689,11 @@ public class JobApplicationSwing {
         startPanel.add(rightGreen,BorderLayout.EAST);
 
         return startPanel;
+    }
+    private void mainScreen(){
+        applicationService = new ApplicationService(7);
+        importService = new ImportService(applicationService);
+        screenPanel.add(createMainPanel(),"MAIN");
+        cardLayout.show(screenPanel,"MAIN");
     }
 }

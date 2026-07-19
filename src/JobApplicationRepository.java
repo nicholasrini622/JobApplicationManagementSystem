@@ -7,10 +7,13 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class JobApplicationRepository {
-    public JobApplicationRepository() {
-        DBHelper.initializeDatabase();
-    }
 
+    /*
+    Method: addApplication
+    Purpose: adds a jobApplication record to the database
+    Parameters: JobApplication application
+    Return: boolean
+     */
     public boolean addApplication(JobApplication application) {
         String sql = """
                 INSERT INTO job_applications (company, position, status, salary, location, work_structure, application_date,
@@ -39,6 +42,12 @@ public class JobApplicationRepository {
         }
         return false;
     }
+    /*
+    Method: removeApplication
+    Purpose: remove and application record from the database
+    Parameters: int applicationID
+    return: boolean
+     */
     public boolean removeApplication(int applicationID){
         String sql = """
                 DELETE FROM job_applications WHERE application_id = ?""";
@@ -56,7 +65,12 @@ public class JobApplicationRepository {
         }
         return false;
     }
-
+/*
+Method: getAllApplications
+Purpose: retrieves application records from database and stores in ArrayList
+Parameters: none
+Return: ArrayList<JobApplication>
+ */
     public ArrayList<JobApplication> getAllApplications() {
         ArrayList<JobApplication> applications = new ArrayList<>();
         String sql = """
@@ -74,7 +88,12 @@ public class JobApplicationRepository {
         }
         return applications;
     }
-
+/*
+Method: buildApplication
+Purpose: BCreates a JobApplication from a database row
+Parameters: ResultSet resultSet
+Return: JobApplication
+ */
     private JobApplication buildApplication(ResultSet resultSet) throws SQLException {
         int applicationID = resultSet.getInt("application_id");
         String company = resultSet.getString("company");
@@ -90,7 +109,12 @@ public class JobApplicationRepository {
 
         return new JobApplication(applicationID, company, position, status, salary, location, workStructure, applicationDate, lastUpdatedDate, applicationUrl, followUpNeeded);
     }
-
+/*
+Method: findApplication
+Purpose: Find a job application record from database based off applicationID
+Parameters: int applicationID
+Return: JobApplication
+ */
     public JobApplication findApplication(int applicationID) {
         String sql = """
                 SELECT * FROM job_applications WHERE application_id = ?""";
@@ -108,11 +132,16 @@ public class JobApplicationRepository {
         }
         return null;
     }
-
+/*
+Method: updateApplication
+Purpose: Update a job application record in db
+Parameters: JobApplication application
+Return: boolean
+ */
     public boolean updateApplication(JobApplication application) {
         String sql = """
                 UPDATE job_applications
-                SET company = ?, position = ?, status = ?, location = ?, work_Structure = ?, application_date = ?, last_updated_date = ?, application_url = ?
+                SET company = ?, position = ?, status = ?, salary = ?, location = ?, work_Structure = ?, application_date = ?, last_updated_date = ?, application_url = ?,
                 follow_up_needed = ? WHERE application_id = ?""";
         try (Connection connection = DBHelper.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {

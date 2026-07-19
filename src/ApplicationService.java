@@ -76,7 +76,11 @@ Return: boolean - true if record was updated, false if the record was invalid, a
             return false;
             }
         application.setLastUpdatedDate(LocalDate.now());
-        return repository.updateApplication(application);
+        boolean updated = repository.updateApplication(application);
+        if(!updated){
+            System.out.println("Update failed: rep[ository/database update failed");
+        }
+        return updated;
         }
 
 /*
