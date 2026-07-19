@@ -24,6 +24,8 @@ public class JobApplicationSwing {
     private final Color BACKGROUND_COLOR = new Color(240, 240, 240);
     private final Color SUCCESS_COLOR = Color.GREEN;
     private final Color WARNING_COLOR = Color.ORANGE;
+    private final Color GREEN = new Color(116,185,34);
+    private final Color DARK_GREEN = new Color(55,125,35);
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
@@ -122,12 +124,12 @@ public class JobApplicationSwing {
      */
     private JPanel createTopPanel() {
         JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(HEADER_COLOR);
+        topPanel.setBackground(GREEN);
         JLabel titleLabel = new JLabel("Job Application Record Management System");
         titleLabel.setFont(new Font("Verdana", Font.BOLD, 20));
-        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setForeground(DARK_GREEN);
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        filterPanel.setBackground(HEADER_COLOR);
+        filterPanel.setBackground(GREEN);
         JComboBox<String> statusFilter = new JComboBox<>();
         statusFilter.addItem("Statuses");
         statusFilter.addItem("Applied");
@@ -157,11 +159,11 @@ public class JobApplicationSwing {
             confirmationLabel.setText("View reset to default.");
         });
         JLabel filterStatusLabel = new JLabel("Filter by Status");
-        filterStatusLabel.setForeground(Color.WHITE);
+        filterStatusLabel.setForeground(DARK_GREEN);
         filterPanel.add(filterStatusLabel);
         filterPanel.add(statusFilter);
         JLabel sortByLabel = new JLabel("Sort by");
-        sortByLabel.setForeground(Color.WHITE);
+        sortByLabel.setForeground(DARK_GREEN);
         filterPanel.add(sortByLabel);
         filterPanel.add(sortBy);
         filterPanel.add(apply);
@@ -636,23 +638,33 @@ public class JobApplicationSwing {
 
     private JPanel createStartPanel() {
         JPanel startPanel = new JPanel(new BorderLayout());
-        startPanel.setBackground(HEADER_COLOR);
-        JPanel titlePanel = new JPanel(new GridLayout(2, 1));
-        titlePanel.setBackground(HEADER_COLOR);
+        startPanel.setBackground(Color.WHITE);
+        JPanel titlePanel = new JPanel(new GridLayout(3, 1));
+        titlePanel.setBackground(Color.WHITE);
+        JPanel leftGreen = new JPanel();
+        leftGreen.setBackground(DARK_GREEN);
+        leftGreen.setPreferredSize(new Dimension(70,0));
+        JPanel rightGreen = new JPanel();
+        rightGreen.setBackground(GREEN);
+        rightGreen.setPreferredSize(new Dimension(70,0));
         titlePanel.setBorder(BorderFactory.createEmptyBorder(60, 10, 20, 10));
         JLabel titleLabel = new JLabel("Job Application Management System", SwingConstants.CENTER);
-        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setForeground(DARK_GREEN);
         titleLabel.setFont(new Font("Verdana", Font.BOLD, 26));
         JLabel subtitle = new JLabel("Select a database", SwingConstants.CENTER);
-        subtitle.setForeground(Color.WHITE);
+        subtitle.setForeground(Color.DARK_GRAY);
         subtitle.setFont(new Font("Verdana", Font.BOLD, 16));
         titlePanel.add(titleLabel);
         titlePanel.add(subtitle);
+        Icon openIcon = UIManager.getIcon("FileView.directoryIcon");
+        Icon databaseIcon = UIManager.getIcon("FileView.hardDriveIcon");
+        Icon exitIcon = UIManager.getIcon("OptionPane.errorIcon");
         JPanel buttonPanel = new JPanel(new GridLayout(3, 1, 12, 12));
-        buttonPanel.setBackground(HEADER_COLOR);
-        JButton openDatabase = new JButton("Open a SQlite Database");
-        JButton defaultDatabase = new JButton("Use job_application.db");
-        JButton exitButton = new JButton("Exit program");
+        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setPreferredSize(new Dimension(360,180));
+        JButton openDatabase = new JButton("Open a SQlite Database", openIcon);
+        JButton defaultDatabase = new JButton("Use job_application.db", databaseIcon);
+        JButton exitButton = new JButton("Exit program", exitIcon);
         openDatabase.setToolTipText("Opens an existing .db or .sqlite file");
         defaultDatabase.setToolTipText("Opens default job_applications.db file");
         exitButton.setToolTipText("Exit application");
@@ -671,11 +683,17 @@ public class JobApplicationSwing {
         buttonPanel.add(openDatabase);
         buttonPanel.add(defaultDatabase);
         buttonPanel.add(exitButton);
-        JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        centerPanel.setBackground(HEADER_COLOR);
-        centerPanel.add(buttonPanel);
-        startPanel.add(titlePanel, BorderLayout.NORTH);
+        JPanel buttonCenterPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonCenterPanel.setBackground(Color.WHITE);
+        buttonCenterPanel.add(buttonPanel);
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.setBackground(Color.WHITE);
+        centerPanel.add(titlePanel,BorderLayout.NORTH);
+        centerPanel.add(buttonCenterPanel,BorderLayout.CENTER);
         startPanel.add(centerPanel, BorderLayout.CENTER);
+        startPanel.add(leftGreen,BorderLayout.WEST);
+        startPanel.add(rightGreen,BorderLayout.EAST);
+
         return startPanel;
     }
 }
