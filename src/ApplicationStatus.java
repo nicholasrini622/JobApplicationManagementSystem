@@ -2,9 +2,11 @@
 Nicholas Rini
 Software Development I
 07/05/2026
-ApplicationStatus
-This class will serve as the option choices for Application Status for the user.  The enum class shows the allowed status responses.
-Application Status reponses include APPLIED, AWAITING_RESPONSE,INTERVIEWING,IN_PROGRESS,DENIED.
+*/
+
+/**
+ * All possible application status options
+ * Status options are consistent throughout job application management system
  */
 public enum ApplicationStatus {
     APPLIED,
@@ -12,13 +14,12 @@ public enum ApplicationStatus {
     INTERVIEWING,
     IN_PROGRESS,
     DENIED;
-/*
-Method: getDisplayName()
-Purpose: Displays enum values as a more readable name
-Parameters: None
-Return: String
- */
-public String getDisplayName(){
+
+    /**
+     * Get a formatted status name for job application status
+     * @return formatted status
+     */
+    public String getDisplayName(){
     return switch (this) {
         case APPLIED -> "Applied";
         case AWAITING_RESPONSE -> "Awaiting Response";
@@ -27,13 +28,14 @@ public String getDisplayName(){
         case DENIED -> "Denied";
     };
 }
-/*
-Method: fromString(String statusChoice)
-Purpose: Converts user input or text file input into an Enum ApplicationStatus value
-Parameter: String statusChoice
-Return: ApplicationStatus
- */
-public static ApplicationStatus fromString(String statusChoice){
+
+    /**
+     * Converts status in to its proper ApplicationStatus
+     * Converts spaces and hyphens to underscore before checking for a match
+     * @param statusChoice application status represented as test
+     * @return a matching ApplicationStatus, or null if nothing is found
+     */
+    public static ApplicationStatus fromString(String statusChoice){
     if(statusChoice== null){
         return null;
     }

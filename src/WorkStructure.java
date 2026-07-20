@@ -1,20 +1,21 @@
 /*
 Nicholas Rini
 Software Development I
-07/05/2026
-WorkStructure
-This class will serve as the option choices for WorkStructure for the user.  The Enum shows the allowed WorkStructure options.
-WorkStructure options include ONSITE,REMOTE,HYBRID.
+07/05/2026.
+ */
+
+/**
+ * All possible workStructure application options
+ * WorkStructure options are consistent throughout.  Contains methods to display workStructure
  */
 public enum WorkStructure {
     ONSITE,
     REMOTE,
     HYBRID;
-    /*
-    Method: getDisplayName()
-    Purpose: Displays enum values as a more readable name
-    Parameters: None
-    Return: String
+
+    /**
+     * Get display name for work structure choices
+     * @return proper display name for work structure
      */
     public String getDisplayName(){
         return switch(this){
@@ -23,12 +24,12 @@ public enum WorkStructure {
             case HYBRID -> "Hybrid";
         };
     }
-    /*
-Method: fromString(String statusChoice)
-Purpose: Converts user input or text file input into an Enum WorkStructure value
-Parameter: String workStructureChoice
-Return: WorkStructure
- */
+
+    /**
+     * Converts work structure to proper enum choice.  Converts spaces and hypens to underscores
+     * @param workStructureChoice work structure represented as text
+     * @return matching choice for WorkStructure or null if none found
+     */
     public static WorkStructure fromString(String workStructureChoice){
         if(workStructureChoice== null){
             return null;
