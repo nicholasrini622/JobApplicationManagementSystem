@@ -13,33 +13,38 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * Handle console input and output.  Class displays menu, reads user input, collects details,
+ * validates input, and displays job application records with proper messages.
+ */
 public class ConsoleView {
     private ApplicationController controller;
     private Scanner scanner;
     private String statusMessage;
 
+    /**
+     * Create ConsoleView with a scanner
+     * Controller is set using setController
+     */
     public ConsoleView() {
         this.controller = null;
         this.scanner = new Scanner(System.in);
         this.statusMessage = "";
     }
 
-    /*
-    Method: setController
-    Purpose: Connect ConsoleView to ApplicationController
-    Parameters: ApplicationController controller
-    Return: boolean - true after controller is assigned
+    /**
+     * Connect ConsoleView to ApplicationController
+     * @param controller controller used by ConsoleView
+     * @return boolean - true when controller is assigned.
      */
     public boolean setController(ApplicationController controller) {
         this.controller = controller;
         return true;
     }
 
-    /*
-    Method: displayMenu
-    Purpose: Displays the main CLI menu to the user
-    Parameters: None
-    Return: boolean - true after menu is displayed (didn't want to add void method)
+    /**
+     * Displays the main menu to the user
+     * @return boolean - true when menu is displayed
      */
     public boolean displayMenu() {
         System.out.println("\n**********");
@@ -57,11 +62,9 @@ public class ConsoleView {
         return true;
     }
 
-    /*
-    Method: menuChoice
-    Purpose:  Read and validate user's menu choice
-    Parameters: none
-    Return: int
+    /**
+     * Reads user choice and validates
+     * @return selected option integer 1-9
      */
     public int menuChoice() {
         while (true) {
@@ -80,11 +83,9 @@ public class ConsoleView {
 
     }
 
-    /*
-    Method: collectApplicationInput
-    Purpose:  Collect and validate job application record details
-    Parameters: None
-    Return: JobApplication
+    /**
+     * Collects user job application record information.  Validates user provided fields
+     * @return JobApplication record based on user input
      */
     public JobApplication collectApplicationInput() {
         String company = "";
@@ -185,12 +186,11 @@ public class ConsoleView {
             return new JobApplication(0, company, position, status, salary, location, workStructure, applicationDate, LocalDate.now(),
                     applicationUrl, false);
         }
-/*
-Method: readApplicationId
-Purpose: Read applicationId entered by user, validate ID
-Parameters: None
-Return: int
- */
+
+    /**
+     * Reads application ID and validates
+     * @return Application ID > 0
+     */
         public int readApplicationId () {
             while (true) {
                 System.out.println("Enter an application ID");
@@ -206,12 +206,11 @@ Return: int
                 }
             }
         }
-/*
-Method: readSortField
-Purpose: Read and validate what field user wants to sort by
-Parameters: None
-Return: String
- */
+
+    /**
+     * Read and validate sort by field
+     * @return selected field to sort by
+     */
         public String readSortField () {
             while (true) {
                 System.out.println("\n Application Sorting Options");
@@ -235,12 +234,12 @@ Return: String
                 }
             }
         }
-/*
-Method: displayAllApplications
-Purpose: Display job application records passed in
-Parameters: ArrayList<JobApplication>
-Return: boolean - true after record or no application record found displayed
- */
+
+    /**
+     * Displays job application records
+     * @param applications ArrayList of applications the user wants to display
+     * @return boolean - true if records are displayed or message is displayed
+     */
         public boolean displayAllApplications (ArrayList < JobApplication > applications) {
             System.out.println("\n*** Application Records***");
             if (applications == null || applications.isEmpty()) {
@@ -252,35 +251,35 @@ Return: boolean - true after record or no application record found displayed
             }
             return true;
         }
-/*
-Method: showMessage
-Purpose: Display a message to user
-Parameters: String message
-Return: boolean - true after a message is displayed
- */
+
+    /**
+     * Used to display a message to the user
+     * @param message message to display
+     * @return boolean - true when message is displayed
+     */
         public boolean showMessage (String message){
             statusMessage = message;
             System.out.println(message);
             return true;
         }
-/*
-Method: showError
-Purpose: Display error message to the user
-Parameters: String error
-Return: boolean - true after error message is displayed
- */
+
+    /**
+     * Display and error message to the user
+     * @param error error message to display
+     * @return boolean - true when error message is displayed
+     */
         public boolean showError (String error){
             statusMessage = error;
             System.out.println(error);
             return true;
         }
-/*
-Method: showFollowUp
-Purpose: Display any applications that need a follow-up
-Parameters: ArrayList<JobApplication> applications
-Return: boolean - true after records or no alerts found displayed
- */
-        public boolean showFollowUp (ArrayList < JobApplication > applications) {
+
+    /**
+     * Displays application that need a follow-up
+     * @param applications ArrayList of applications needing a follow-up
+     * @return boolean - true if applications or message displayed
+     */
+        public boolean showFollowUp (ArrayList<JobApplication> applications) {
             System.out.println("\n*** Follow-UP ***");
             if (applications == null || applications.isEmpty()) {
                 System.out.println("No alerts found");
@@ -291,12 +290,12 @@ Return: boolean - true after records or no alerts found displayed
             }
             return true;
         }
-/*
-Method: deleteConfirmation
-Purpose:  Display application record selected to be removed and ask for confirmation
-Parameters: JobApplication application
-Return: boolean - true after user confirms removal, false if the user decides to cancel or doesnt select a record
- */
+
+    /**
+     * Displays the selected application and prompts for confirmation
+     * @param application application to remove
+     * @return boolean - true if user confirms removal, false if canceled or nothing is selected
+     */
         public boolean deleteConfirmation (JobApplication application){
             if (application == null) {
                 System.out.println("No application selected.");
@@ -315,12 +314,11 @@ Return: boolean - true after user confirms removal, false if the user decides to
                 System.out.println("Error: Please choose yes or no, or y/n");
             }
         }
-/*
-Method: readStatusFilter
-Purpose: read and validate a status to filter chosen by the user
-Parameters: None
-Return: ApplicationStatus
- */
+
+    /**
+     * Read application status user chooses and validate
+     * @return selected application status
+     */
         public ApplicationStatus readStatusFilter () {
             while (true) {
                 System.out.println("\nApplication status Options");
@@ -347,17 +345,23 @@ Return: ApplicationStatus
                 }
             }
         }
-/*
-Method: readFilePath
-Purpose: Read the text file path that will be used to import job application records
-Parameters: None
-Return: String
- */
+
+    /**
+     * Read file path that is used to import application record
+     * @return user entered file path
+     */
         public String readFilePath () {
             System.out.println("Enter file path to import text file");
             return scanner.nextLine().trim();
         }
-        public JobApplication UpdatedApplicationInput (JobApplication currentApplication){
+
+    /**
+     * Collect updated values for an application record.  Copy record, select which field to update
+     * Return updated application when updating is complete
+     * @param currentApplication application record to update
+     * @return updated JobApplication record
+     */
+    public JobApplication UpdatedApplicationInput (JobApplication currentApplication){
             JobApplication updatedApplication = new JobApplication(currentApplication.getApplicationID(), currentApplication.getCompany(),
                     currentApplication.getPosition(), currentApplication.getStatus(), currentApplication.getSalary(), currentApplication.getLocation(),
                     currentApplication.getWorkStructure(), currentApplication.getApplicationDate(), currentApplication.getLastUpdatedDate(),

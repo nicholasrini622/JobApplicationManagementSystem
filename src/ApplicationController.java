@@ -6,21 +6,33 @@ Class: ApplicationController
 Purpose: Controller class connects the ConsoleView, ApplicationService, and ImportService classes
  */
 import java.util.ArrayList;
+
+/**
+ * Handles communication between ConsoleView, ApplicationService, and ImportService.  Process menu choices
+ * send application to ApplicationService, and tell ConsoleView messages or records to display
+ */
 public class ApplicationController {
     private ConsoleView view;
     private ApplicationService applicationService;
     private ImportService importService;
+
+    /**
+     * Create ApplicationController with ConsoleView and service classes
+     * @param view ConsoleView for input and output
+     * @param applicationService ApplicationService to manage job applications
+     * @param importService ImportService to import job applications
+     */
     public ApplicationController(ConsoleView view, ApplicationService applicationService, ImportService importService){
         this.view = view;
         this.applicationService = applicationService;
         this.importService = importService;
     }
-/*
-Method: processAddApplication
-Purpose: Send created job application to applicationService
-Parameters: JobApplication application
-Return: boolean - true if application was added, false if the application is invalid or a duplicate
- */
+
+    /**
+     * Sends job application record to ApplicationService
+     * @param application job application record to add
+     * @return boolean - true if application is added, false if invalid or duplicate
+     */
     public boolean processAddApplication(JobApplication application){
         if(applicationService.addApplication(application)){
             view.showMessage("Application added!");
@@ -29,12 +41,12 @@ Return: boolean - true if application was added, false if the application is inv
         view.showError("Application was not added.  May contain duplicate or invalid data.");
         return false;
     }
-/*
-Method: processUpdateApplication
-Purpose: Send updated job application to ApplicationService to update application record
-Parameters: JobApplication application
-Return: boolean - true if application was updated, false if the update failed
- */
+
+    /**
+     * Send updated application to ApplicationService to update record
+     * @param application job application record containing updated information
+     * @return boolean - true if application is updated, false if failed
+     */
     public boolean processUpdateApplication(JobApplication application){
         if(applicationService.updateApplication(application)){
             view.showMessage("Application successfully updated.");
@@ -43,12 +55,12 @@ Return: boolean - true if application was updated, false if the update failed
         view.showError("Application could not be updated. Record can not be duplicate and ID must exist.");
         return false;
     }
-/*
-Method: processRemoveApplication
-Purpose:  Locate job application by application ID, confirms removal, and removes the application record
-Parameters: int applicationId
-Return: boolean - true if application is removed, false is application removal failed or cancelled.
- */
+
+    /**
+     * Checks for a job application by ID, confirm removal, and remove record
+     * @param applicationId applicationID of application record to remove
+     * @return boolean - true if application is removed, false if not removed
+     */
     public boolean processRemoveApplication(int applicationId){
         JobApplication application = applicationService.findApplicationById(applicationId);
         if(application == null){
@@ -66,12 +78,12 @@ Return: boolean - true if application is removed, false is application removal f
         view.showError("Application not removed.");
         return false;
     }
-/*
-Method: processImportApplications
-Purpose:  Imports job aplpications from text file and display valid records
-Parameters: String filePath
-Return: int (number of valid applications imported)
- */
+
+    /**
+     * Import valid job application records from a text file and display them
+     * @param filePath path of text file to import
+     * @return int for number of valid application records/rows created
+     */
     public int processImportApplications(String filePath){
         ArrayList<JobApplication> importApplications = importService.importApplications(filePath);
         if(importApplications.isEmpty()){
@@ -84,54 +96,51 @@ Return: int (number of valid applications imported)
         view.showMessage("Skipped invalid record - " + importService.getInvalidRecordCount());
         return importApplications.size();
     }
-/*
-Method: viewApplications()
-Purpose:  Get current job application records from application service class
-Parameters: None
-Return: ArrayList<JobApplication>
- */
+
+    /**
+     * Get application records from ApplicationService
+     * @return ArrayList of all job application records
+     */
     public ArrayList<JobApplication> viewApplications(){
         return applicationService.getAllApplications();
     }
-/*
-Method: processFilterApplications
-Purpose: Filter job application records by application status and display records
-Parameters: ApplicationStatus status
-Return: filtered ArrayList<JobApplication>
- */
+
+    /**
+     * Filter application records by a status and display results
+     * @param status application status to filter by
+     * @return ArrayList containing all filtered applications
+     */
     public ArrayList<JobApplication> processFilterApplication(ApplicationStatus status){
         ArrayList<JobApplication> filterList = applicationService.filterByStatus(status);
         view.displayAllApplications(filterList);
         return filterList;
     }
-/*
-Method: processSortApplications
-Purpose: Sort application records by a selected field, display the results
-Parameters: String sortField
-Return: sorted ArrayList<JobApplication>
- */
+
+    /**
+     * Sorts applications by a selected field and display the results
+     * @param sortField field to sort application records by
+     * @return ArrayList containing sorted applications
+     */
     public ArrayList<JobApplication> processSortApplications(String sortField){
         ArrayList<JobApplication> sortedList = applicationService.sortApplications(sortField);
         view.displayAllApplications(sortedList);
         return sortedList;
     }
-/*
-Method: processFollowUp()
-Purpose: Retrieve applications that need a follow-up and display them
-Parameters: None
-Return: ArrayList<JobApplication> of records that need a follow-up
- */
+
+    /**
+     * Retrieve applications that may require a follow-up and display results
+     * @return ArrayList containing job applications needing a follow-up
+     */
     public ArrayList<JobApplication> processFollowUp(){
         ArrayList<JobApplication> followUpList = applicationService.getFollowUpApplications();
         view.showFollowUp(followUpList);
         return followUpList;
     }
-/*
-Method: runMenu()
-Purpose: Run the main CLi menu loop and process user choices
-Parameters: None
-Return: boolean - true after loop ends (did not want to create void methods)
- */
+
+    /**
+     * Runs main console menu and processes user choices
+     * @return boolean - true when menu loop ends
+     */
     public boolean runMenu(){
         boolean running = true;
         while(running){

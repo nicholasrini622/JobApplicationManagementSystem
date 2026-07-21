@@ -1,11 +1,6 @@
-/*
-Nicholas Rini
-Software Development I
-07/05/2026
-JobApplicationManagementApp
-This is the main class that will perform the runMenu() function.  The user will be able to perform CRUD operations, sort, filter, and check for follow-up
-alerts for Job Application records.  The user shall be able to import records from a text-file or manually enter them.  This program will evolve in to an all-in
-one storage and operation center for Job Application Records.
+/**
+ * Console Version of the Job Application Management System.  Class creates ApplicationService,
+ * ImportService, ConsoleView, and ApplicationController and starts the main menu loop
  */
 
 public class JobApplicationManagementApp {
