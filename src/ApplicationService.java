@@ -11,10 +11,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+/**
+ * Handles the main logic for job application records
+ * Validate applications, add applications, update applications, remove, sort/filter, and perform follow-up check
+ */
 public class ApplicationService {
     private int followUpLimit;
     private JobApplicationRepository repository;
 
+    /**
+     * Create an ApplicationService object with follow-up limit
+     * If follow up limit is not >0, 7 day limit will be used
+     * @param followUpLimit days before a follow up is considered needed
+     */
     public ApplicationService(int followUpLimit) {
         if (followUpLimit > 0) {
             this.followUpLimit = followUpLimit;
@@ -23,12 +32,12 @@ public class ApplicationService {
         }
         this.repository = new JobApplicationRepository();
     }
-/*
-Method: validateApplication
-Purpose:  Validates if a job application has all the required fields before storing the record.
-Parameters: JobApplication application
-Return:  Boolean - true if valid, false if record is invalid.
- */
+
+    /**
+     * Validates job application records, maintains that record has all required fields
+     * @param application JobApplication record to validate
+     * @return boolean - true if valid, false if not
+     */
     public boolean validateApplication(JobApplication application) {
         if (application == null || application.getStatus() == null || application.getWorkStructure() == null) {
             return false;
@@ -45,12 +54,13 @@ Return:  Boolean - true if valid, false if record is invalid.
         }
         return true;
     }
-/*
-Method: addApplication
-Purpose:  Adds valid unique job application to ArrayList<JobApplication>
-Parameters: JobApplication application
-Return:  Boolean - true if application record is added, false if invalid or non-unique.
- */
+
+    /**
+     * Add a valid unique application to database.
+     * Last updated date is set to current date
+     * @param application application to add
+     * @return boolean - true if application is added, false if invalid or duplicate
+     */
     public boolean addApplication(JobApplication application) {
         if (!validateApplication(application) || isDuplicateApplication(application,0)) {
             return false;
@@ -58,12 +68,12 @@ Return:  Boolean - true if application record is added, false if invalid or non-
         application.setLastUpdatedDate(LocalDate.now());
         return repository.addApplication(application);
     }
-/*
-Method: updateApplication
-Purpose:  Update an existing application record with valid information
-Parameters: JobApplication application
-Return: boolean - true if record was updated, false if the record was invalid, a duplicate, or missing.
- */
+
+    /**
+     * Update job application with valid information.  Updated application can not exist or become a duplicate
+     * @param application job application record to update
+     * @return true if updated, false if invalid, missing, or becomes a duplicate
+     */
     public boolean updateApplication(JobApplication application) {
         if (!validateApplication(application)) {
             return false;
@@ -83,12 +93,11 @@ Return: boolean - true if record was updated, false if the record was invalid, a
         return updated;
         }
 
-/*
-Method: removeAppplication
-Purpose:  Remove  a jobApplication record from the list based on applicationID
-Parameters: int applicationID
-Return: boolean - true if application was removed, false if there isn't a matching ID
- */
+    /**
+     * Remove application from database based off applicationID
+     * @param applicationID ID of application record to remove
+     * @return boolean - true if record was removed, false if no application is found to remove
+     */
     public boolean removeApplication(int applicationID) {
         JobApplication application = findApplicationById(applicationID);
         if (application == null) {
@@ -96,21 +105,20 @@ Return: boolean - true if application was removed, false if there isn't a matchi
         }
         return repository.removeApplication(applicationID);
     }
-/*
-Method: findApplicationById
-Purpose: This method searches the application record list for any record with a matching ID
-Parameters: int applicationID
-Returns; JobApplication or null if no match
- */
+
+    /**
+     * Locate a job application based off applicationID
+     * @param applicationID ID of application to find
+     * @return matching JobApplication record, or null if no record could be found
+     */
     public JobApplication findApplicationById(int applicationID) {
         return repository.findApplication(applicationID);
     }
-/*
-Method: getAllApplications()
-Purpose: Gives access to current ArrayList<JobApplication>
-Parameter: None
-Return:  ArrayList<JobApplication>
- */
+
+    /**
+     * Grabs all applications from the database
+     * @return Arraylist<JobApplication> containing all job applications
+     */
     public ArrayList<JobApplication> getAllApplications() {
         return repository.getAllApplications();
     }
@@ -132,12 +140,11 @@ Return: int
     }
     */
 
-/*
-Method: sortApplications
-Purpose: Create a sorted application record list copy based on a selected field
-Parameters: String sortField
-Return: sorted ArrayList<JobApplication>
- */
+    /**
+     * Create a sorted list of job application records based on selected sort field, company, position, salary, and date
+     * @param sortField field to sort by
+     * @return sorted ArrayList<JobApplication>
+     */
     public ArrayList<JobApplication> sortApplications(String sortField) {
         ArrayList<JobApplication> sortedList = new ArrayList<>(getAllApplications());
         if (sortField == null || sortField.isBlank()) {
@@ -184,12 +191,12 @@ Return: sorted ArrayList<JobApplication>
         }
         return sortedList;
     }
-/*
-Method: filterByStatus
-Purpose: Create a filtered application list based on a certain status
-Parameters: ApplicationStatus status
-Return: filtered ArrayList<JobApplication>
- */
+
+    /**
+     * Create a filtered list based off ApplicationStatus
+     * @param status application status to filter by
+     * @return a filtered ArrayList based off selected status.
+     */
     public ArrayList<JobApplication> filterByStatus(ApplicationStatus status){
         ArrayList<JobApplication> filterList = new ArrayList<>();
         for(JobApplication application: getAllApplications()){
@@ -199,12 +206,13 @@ Return: filtered ArrayList<JobApplication>
         }
         return filterList;
     }
-/*
-Method: isDuplicateApplication
-Purpose: Check if an existing application already has the same company and position
-Parameters: JobApplication applicationCopy
-Return: boolean - true if duplicate is found, false if no duplicate is found.
- */
+
+    /**
+     * Check if application has same company and position.  Ignore Application ID
+     * @param applicationCopy application to check for duplicate
+     * @param currentApplicationID id of current application, or 0 if application is new
+     * @return true if a duplicate exists, false if no duplicates found
+     */
     private boolean isDuplicateApplication(JobApplication applicationCopy, int currentApplicationID) {
         for (JobApplication application : getAllApplications()) {
             boolean sameCompany = application.getCompany().equalsIgnoreCase(applicationCopy.getCompany());
@@ -216,12 +224,12 @@ Return: boolean - true if duplicate is found, false if no duplicate is found.
         }
         return false;
     }
-/*
-Method: isFollowUpNeeded
-Purpose: Check if a application record needs a follow-up based off last updated date
-Parameters: JobApplication application
-Return: boolean - true if follow-up is required, false if no follow-up needed
- */
+
+    /**
+     * Check if a job application record requires a follow-up.  Applications marked as denied should not be marked
+     * @param application JobApplication record to check
+     * @return boolean - true if follow up is needed, false if no follow up is needed.
+     */
     public boolean isFollowUpNeeded(JobApplication application) {
         if (application == null || application.getStatus() == ApplicationStatus.DENIED || application.getLastUpdatedDate() == null) {
             return false;
@@ -230,12 +238,11 @@ Return: boolean - true if follow-up is required, false if no follow-up needed
 
         return !application.getLastUpdatedDate().isAfter(followUpDate);
     }
-/*
-Method: getFollowUpApplications()
-Purpose: Method will create a list of applications that need a follow-up
-Parameters: None
-Return: ArrayList<JobApplication> records that need a follow-up.
- */
+
+    /**
+     * Creates a list of job application records that need a follow up
+     * @return ArrayList of job applications that need follow up
+     */
     public ArrayList<JobApplication> getFollowUpApplications(){
         ArrayList<JobApplication> followUp = new ArrayList<>();
         for(JobApplication application : getAllApplications()){
@@ -251,21 +258,21 @@ Return: ArrayList<JobApplication> records that need a follow-up.
         }
         return followUp;
     }
-/*
-Method: validateSalary
-Purpose: Validation for salary field
-Parameters: double salary
-Return: boolean - true if salary is >=0, false it the salary is a negative number
- */
+
+    /**
+     * Checks if a salary is negative
+     * @param salary salary to validate
+     * @return true if salary is not negative, false if it is negative
+     */
     public boolean validateSalary(double salary) {
         return salary >= 0;
     }
-/*
-Method: validateDate
-Purpose: Validation for application date.  Checks if date is from the future
-Parameters: LocalDate date
-Return: boolean - true if date is valid, false if date is null or from the future.
- */
+
+    /**
+     * Validate application date to check if not null and not in the future
+     * @param date application date to validate
+     * @return boolean - true if date is valid, false if null or future date
+     */
     public boolean validateDate(LocalDate date) {
         if (date == null) {
             return false;
