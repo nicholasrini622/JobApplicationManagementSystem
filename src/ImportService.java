@@ -14,21 +14,28 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Imports job application records from a text file.  Reads  and converts each row in to valid objects using
+ * ApplicationService, count invalid records
+ */
 public class ImportService {
     private ApplicationService applicationService;
-
-
     private int invalidRecordCount;
+
+    /**
+     * Create ImportService object using ApplicationService validation and add imported records
+     * @param applicationService service object used to add imported applications
+     */
     public ImportService(ApplicationService applicationService){
         this.applicationService = applicationService;
         this.invalidRecordCount = 0;
     }
-/*
-Method: importApplications
-Purpose: Read text file, parse each row, import any valid job application records
-Parameters: String filePath
-Return: ArrayList<JobApplication> of imported applications
- */
+
+    /**
+     * Read a text file and import valid records.  Invalid rows/Duplicates are skipped and count is given
+     * @param filePath path to text file for import
+     * @return ArrayList of applications that were imported
+     */
     public ArrayList<JobApplication> importApplications(String filePath) {
         ArrayList<JobApplication> importList = new ArrayList<>();
         invalidRecordCount = 0;
@@ -62,12 +69,14 @@ Return: ArrayList<JobApplication> of imported applications
         }
         return importList;
     }
-/*
-Method: parseApplicationLine
-Purpose: Convert a row from an imported text file in to a JobApplication object
-Parameters: String line
-Return: JobApplication
- */
+
+    /**
+     * Converts a row from imported text file into a JobApplication object.  A row contains 7 fields company, position, status,
+     * salary, location, work structure, and an application date. Optional 8th fields for applicationURL
+     * @param line text file row to convert
+     * @return created JobApplication record from row in text file
+     * @throws InvalidImportException throws exception if rows blank, incomplete, or has an invalid date
+     */
             public JobApplication parseApplicationLine (String line) throws InvalidImportException {
                 if (!validateFile(line)) {
                     throw new InvalidImportException(" A job application Record row must have 7 fields");
@@ -109,12 +118,11 @@ Return: JobApplication
                 return new JobApplication(0, company, position, status, salary, location, workStructure, applicationDate, LocalDate.now(), applicationUrl, false);
             }
 
-/*
-Method: validateFile
-Purpose: Check if a row from imported file has the required format
-Parameters: String line
-Return: boolean - true if a row has 7 fields, false if the row is blank or incomplete
- */
+    /**
+     * Checks if an imported row has the correct format.  Valid rows cant be blank and must contain seven fields
+     * @param line row from imported text file
+     * @return boolean - true if row has all fields, false if blank or incomplete
+     */
             public boolean validateFile (String line){
                 if (line == null || line.isBlank()) {
                     return false;
