@@ -2,17 +2,19 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.ParsePosition;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+/**
+ * Manage database crud operations
+ * Add,remove,update,find, and retrieve from database
+ */
 public class JobApplicationRepository {
 
-    /*
-    Method: addApplication
-    Purpose: adds a jobApplication record to the database
-    Parameters: JobApplication application
-    Return: boolean
+    /**
+     * Add an application to the database
+     * @param application a JobApplication to add
+     * @return boolean - true if application added, false if not
      */
     public boolean addApplication(JobApplication application) {
         String sql = """
@@ -42,11 +44,11 @@ public class JobApplicationRepository {
         }
         return false;
     }
-    /*
-    Method: removeApplication
-    Purpose: remove and application record from the database
-    Parameters: int applicationID
-    return: boolean
+
+    /**
+     * Remove an application based off application ID
+     * @param applicationID ID for application to remove
+     * @return boolean - true if removes, false if not removed
      */
     public boolean removeApplication(int applicationID){
         String sql = """
@@ -65,12 +67,11 @@ public class JobApplicationRepository {
         }
         return false;
     }
-/*
-Method: getAllApplications
-Purpose: retrieves application records from database and stores in ArrayList
-Parameters: none
-Return: ArrayList<JobApplication>
- */
+
+    /**
+     * Gets all application records from the database
+     * @return ArrayList<JobApplication> containing job application records
+     */
     public ArrayList<JobApplication> getAllApplications() {
         ArrayList<JobApplication> applications = new ArrayList<>();
         String sql = """
@@ -88,12 +89,13 @@ Return: ArrayList<JobApplication>
         }
         return applications;
     }
-/*
-Method: buildApplication
-Purpose: BCreates a JobApplication from a database row
-Parameters: ResultSet resultSet
-Return: JobApplication
- */
+
+    /**
+     * Create JobApplication from database row
+     * @param resultSet the result row used to build the application
+     * @return JobApplication
+     * @throws SQLException if result row cant be read
+     */
     private JobApplication buildApplication(ResultSet resultSet) throws SQLException {
         int applicationID = resultSet.getInt("application_id");
         String company = resultSet.getString("company");
@@ -109,12 +111,12 @@ Return: JobApplication
 
         return new JobApplication(applicationID, company, position, status, salary, location, workStructure, applicationDate, lastUpdatedDate, applicationUrl, followUpNeeded);
     }
-/*
-Method: findApplication
-Purpose: Find a job application record from database based off applicationID
-Parameters: int applicationID
-Return: JobApplication
- */
+
+    /**
+     * Find job application record using ID
+     * @param applicationID application ID for application record to find
+     * @return matching JobApplication record, or null if no matches found.
+     */
     public JobApplication findApplication(int applicationID) {
         String sql = """
                 SELECT * FROM job_applications WHERE application_id = ?""";
@@ -132,12 +134,12 @@ Return: JobApplication
         }
         return null;
     }
-/*
-Method: updateApplication
-Purpose: Update a job application record in db
-Parameters: JobApplication application
-Return: boolean
- */
+
+    /**
+     * Update an JobApplication record from database
+     * @param application job application record to update
+     * @return boolean - true if application was updated, false if not updated.
+     */
     public boolean updateApplication(JobApplication application) {
         String sql = """
                 UPDATE job_applications
