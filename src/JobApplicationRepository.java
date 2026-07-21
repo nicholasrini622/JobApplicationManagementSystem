@@ -70,7 +70,7 @@ public class JobApplicationRepository {
 
     /**
      * Gets all application records from the database
-     * @return ArrayList<JobApplication> containing job application records
+     * @return ArrayList containing job application records
      */
     public ArrayList<JobApplication> getAllApplications() {
         ArrayList<JobApplication> applications = new ArrayList<>();

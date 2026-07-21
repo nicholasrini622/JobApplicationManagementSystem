@@ -117,7 +117,7 @@ public class ApplicationService {
 
     /**
      * Grabs all applications from the database
-     * @return Arraylist<JobApplication> containing all job applications
+     * @return Arraylist containing all job applications
      */
     public ArrayList<JobApplication> getAllApplications() {
         return repository.getAllApplications();
@@ -143,7 +143,7 @@ Return: int
     /**
      * Create a sorted list of job application records based on selected sort field, company, position, salary, and date
      * @param sortField field to sort by
-     * @return sorted ArrayList<JobApplication>
+     * @return sorted ArrayList
      */
     public ArrayList<JobApplication> sortApplications(String sortField) {
         ArrayList<JobApplication> sortedList = new ArrayList<>(getAllApplications());
