@@ -10,6 +10,11 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
 
+/**
+ * Class creates Swing GUI of the Job Application Management System.  JobApplicationSwing displays start screen,
+ * allows for database selection, displays job application records in a table.  Allows for CRUD operations additionally
+ * filtering, sorting, and a custom follow-up alert
+ */
 public class JobApplicationSwing {
     private ApplicationService applicationService;
     private JTable applicationTable;
@@ -27,6 +32,10 @@ public class JobApplicationSwing {
     private final Color GREEN = new Color(116,185,34);
     private final Color DARK_GREEN = new Color(55,125,35);
 
+    /**
+     * Main method to start Swing GUI of application
+     * @param args
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             JobApplicationSwing app = new JobApplicationSwing();
@@ -35,11 +44,8 @@ public class JobApplicationSwing {
 
     }
 
-    /*
-    Method: createGUI()
-    Purpose: Creates the main window and panels
-    Parameters: None
-    Return: Void
+    /**
+     * Create main GUI window and display start screen
      */
     private void createGUI() {
         frame = new JFrame("Job Application Management System");
@@ -54,11 +60,8 @@ public class JobApplicationSwing {
 
     }
 
-    /*
-    Method: refreshTable()
-    Purpose: Refreshes the table to display all records from ApplicationService
-    Parameters: None
-    Return: void
+    /**
+     * Refreshes job application record table to display records from ApplicationService
      */
     public void refreshTable() {
         tableModel.setRowCount(0);
@@ -72,11 +75,9 @@ public class JobApplicationSwing {
         applicationTable.clearSelection();
     }
 
-    /*
-    Method: Overloaded refreshTable
-    Purpose: Refresh table with a specific list
-    ParametersL ArrayList<JobApplication> displayApplications
-    Return: void
+    /**
+     * Refresh table using specific ArrayList of applications
+     * @param displayApplications ArrayList of applications displayed in the table
      */
     public void refreshTable(ArrayList<JobApplication> displayApplications) {
         tableModel.setRowCount(0);
@@ -90,11 +91,9 @@ public class JobApplicationSwing {
         applicationTable.clearSelection();
     }
 
-    /*
-    Method: createTable
-    Purpose: Creates the table that displays job application information
-    Parameters: None
-    Return: JScrollpane
+    /**
+     * Create a table that is used to display job application records
+     * @return JScrollPane holding application table
      */
     public JScrollPane createTable() {
         String[] columns = {
@@ -112,11 +111,9 @@ public class JobApplicationSwing {
         return new JScrollPane(applicationTable);
     }
 
-    /*
-    Method: createTopPanel
-    Purpose: Creates the top panel that contains, title, filter and sort dropdowns, apply button, and reset defaults
-    Parameters: None
-    Return: JPanel
+    /**
+     * Creates a top panel with application title, filter and sort dropdown menus, apply and reset button
+     * @return JPanel for top section of main screen
      */
     private JPanel createTopPanel() {
         JPanel topPanel = new JPanel(new BorderLayout());
@@ -170,11 +167,9 @@ public class JobApplicationSwing {
 
     }
 
-    /*
-    Method: bottomPanel
-    Purpose: creates the bottom panel with our CRUD buttons and messaging
-    Parameters: None
-    Return: void
+    /**
+     * Creates bottom panel for CRUD operations, custom follow-up, exit button, and messaging labels
+     * @return JPanel holding bottom section of main screen
      */
     private JPanel bottomPanel() {
         JPanel bottomPanel = new JPanel(new BorderLayout());
@@ -221,11 +216,8 @@ public class JobApplicationSwing {
         return bottomPanel;
     }
 
-    /*
-    Method: openAddApplicationForm
-    Purpose: opens the add application form, validates input, and adds a record
-    Parameters: None
-    return: void
+    /**
+     * Opens add application form and validates input.  Adds a new valid job application record
      */
     private void openAddApplicationForm() {
         JTextField companyField = new JTextField();
@@ -307,11 +299,8 @@ public class JobApplicationSwing {
 
     }
 
-    /*
-    Method: removeSelectedApplication
-    Purpose: removes a selected application after confirmation
-    Parameters: None
-    Return: void
+    /**
+     * Remove a selected application from table and database.  Requires user confirmation
      */
     private void removeSelectedApplication() {
         int selectedRow = applicationTable.getSelectedRow();
@@ -338,11 +327,8 @@ public class JobApplicationSwing {
         }
     }
 
-    /*
-    Method: updateSelectedApplication
-    Purpose: updates a selected application and saves updates
-    Parameters: None
-    Return: void
+    /**
+     * Opens update form to update a selected application.  Valid updates are saved
      */
     private void updateSelectedApplication() {
         int selectedRow = applicationTable.getSelectedRow();
@@ -439,11 +425,8 @@ public class JobApplicationSwing {
 
     }
 
-    /*
-    Method: importApplicationFile
-    Purpose: Imports a file from file picker, file must be .txt.  Sends file path to importservice class
-    Parameters: none
-    Return: void
+    /**
+     * Open file picker and import job application records from a .txt file
      */
     private void importApplicationFile() {
         JFileChooser filePicker = new JFileChooser();
@@ -470,6 +453,10 @@ public class JobApplicationSwing {
         }
     }
 
+    /**
+     * Open file picker for user to select a SQlite database.  Valid extensions include .db,.sqlite,.sqlite3
+     * Saves database and opens main screen
+     */
     private void openDatabase() {
         JFileChooser dataBasePicker = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter("SQLite Database File (*.db, *.sqlite, *.sqlite3)", "db", "sqlite", "sqlite3");
@@ -499,11 +486,10 @@ public class JobApplicationSwing {
         }
     }
 
-    /*
-    Method: filterAndASort
-    Purpose: Applies the selected filter and/or sort
-    Parameters: JComboBox<String> statusFilter, JComboBox<String> sort field)
-    Return: void
+    /**
+     * Apply status filter and sort option to table
+     * @param statusFilter combo box containing selected status filter
+     * @param sortField combo box containing selected sort field
      */
     private void filterAndSort(JComboBox<String> statusFilter, JComboBox<String> sortField) {
         String statusChoice = statusFilter.getSelectedItem().toString();
@@ -525,11 +511,8 @@ public class JobApplicationSwing {
         confirmationLabel.setText("Displaying " + displayApplications.size() + "records. Filter: " + statusChoice + ", Sort: " + sortChoice);
     }
 
-    /*
-    Method: showFollowUp
-    Purpose: display applications that might need a follow-up using ApplicationService follow-up
-    Parameters: none
-    Return: void
+    /**
+     * Displays application that need a follow up, uses ApplicationService logic
      */
     private void showFollowUp() {
         ArrayList<JobApplication> followUpApplications = applicationService.getFollowUpApplications();
@@ -544,11 +527,14 @@ public class JobApplicationSwing {
         JOptionPane.showMessageDialog(applicationTable, followUpApplications.size() + " should be followed up ", "Follow-Up alerts", JOptionPane.WARNING_MESSAGE);
     }
 
-    /*
-    Method: validateApplication
-    Purpose: validate all user input from add and update forms.  Display appropriate message
-    Parameters: String comapny, String position, String salaryText, String location, String applicationDate
-    Return: String
+    /**
+     * Validate user input in add and update forms
+     * @param company company name entered
+     * @param position position of job entered
+     * @param salaryText salary as text enetered by user
+     * @param location location entered by user
+     * @param applicationDate application date entered by user
+     * @return error message for invalid input, null for invalid input
      */
     private String validateApplication(String company, String position, String salaryText, String location, String applicationDate) {
         if (company.isBlank()) {
@@ -607,11 +593,10 @@ public class JobApplicationSwing {
         return null;
     }
 
-    /*
-   Method: parseDate
-   Purpose: Convert a String date to LocalDate
-   Parameters: String applicationComponents
-   Return: void
+    /**
+     * Converts String date to LocalDate
+     * @param applicationComponents date as text entered by user
+     * @return LocalDate
      */
     private LocalDate parseDate(String applicationComponents) {
         String[] dateComponent = applicationComponents.split("/");
@@ -621,6 +606,10 @@ public class JobApplicationSwing {
         return LocalDate.of(year, month, day);
     }
 
+    /**
+     * Create main panel, contains top paneel, table, and bottom button panel
+     * @return JPanel that contains main screen
+     */
     private JPanel createMainPanel() {
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(BACKGROUND_COLOR);
@@ -631,6 +620,10 @@ public class JobApplicationSwing {
         return mainPanel;
     }
 
+    /**
+     * Create start panel to open database, use default database, and exit program
+     * @return JPanel that contains the start screen
+     */
     private JPanel createStartPanel() {
         JPanel startPanel = new JPanel(new BorderLayout());
         startPanel.setBackground(Color.WHITE);
@@ -690,6 +683,11 @@ public class JobApplicationSwing {
 
         return startPanel;
     }
+
+    /**
+     * Create ApplicationService, and ImportService objects
+     * switch from start screen to main screen
+     */
     private void mainScreen(){
         applicationService = new ApplicationService(7);
         importService = new ImportService(applicationService);
